@@ -46,6 +46,13 @@ project "MemorySystem"
 
     files { "src/MemorySystem/**.h", "src/MemorySystem/**.cpp" }
 
+    -- Setup filters for VS solution (somehow it ignores the subfolders and does not create them properly)
+    -- vpaths { ["MemoryRealm"] = { "src/MemorySystem/MemoryRealm/**.h", "src/MemorySystem/MemoryRealm/**.cpp" } }
+    -- vpaths { ["Allocator"] = { "src/MemorySystem/Allocator/**.h", "src/MemorySystem/Allocator/**.cpp" } }
+    -- vpaths { ["BoundsChecker"] = { "src/MemorySystem/BoundsChecker/**.h", "src/MemorySystem/BoundsChecker/**.cpp" } }
+    -- vpaths { ["MemoryTracker"] = { "src/MemorySystem/MemoryTracker/**.h", "src/MemorySystem/MemoryTracker/**.cpp" } }
+
+
     filter "configurations:Debug"
         symbols "On"
         flags { "StaticRuntime" }
