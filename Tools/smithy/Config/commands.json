@@ -1,0 +1,30 @@
+{ 
+	"commands": 
+	[
+		{ 	
+			"name" : "Generate VS17 project files",
+			"job" : "cmd.exe /K \"cd /d %PROJECT_ROOT% && %PREMAKE_HOME%\\premake5.exe vs2017 && exit", 
+			"category" : "premake"
+		},
+		{ 	
+			"name" : "Premake clean",
+			"job" : "cmd.exe /K \"cd /d %PROJECT_ROOT% && %PREMAKE_HOME%\\premake5.exe clean && exit", 
+			"category" : "premake"
+		},
+		{
+			"name" : "Open Spark++ solution",
+			"job" : "cmd.exe /K \"cd /d %PROJECT_ROOT% && start .\\workspaces\\vs2017\\%PROJECT_NAME%.sln /D .\" && exit",
+			"category" : "Visual Studio"
+		},
+		{ 
+			"name" : "Open project wiki",
+			"job" : "explorer \"%WIKI_URL%\"",
+			"category" : "General"
+		},
+		{ 
+			"name" : "Open Explorer",
+			"job" : "explorer %PROJECT_ROOT%",
+			"category" : "General"
+		}
+	]
+}

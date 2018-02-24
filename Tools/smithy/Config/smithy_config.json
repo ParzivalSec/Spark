@@ -1,0 +1,7 @@
+{
+	"PROJECT_ROOT" : "C:\\Projekte\\Project_Spark",
+	"SRC_ROOT" : ".\\src",
+	"PREMAKE_HOME" : ".\\Tools\\premake",
+	"WIKI_URL": "https://www.github.com/ParzivalSec/Spark.git",
+	"PROJECT_NAME" : "Spark"
+}
