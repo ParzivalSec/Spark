@@ -27,9 +27,10 @@ namespace sp
 			virtual ~LinearAllocator() override;
 
 		private:
+			bool m_useInternalMemory;
 			pointerUtil::PointerType m_memoryBegin;
 			pointerUtil::PointerType m_memoryEnd;
-			pointerUtil::PointerType m_nextAllocationPtr;
+			pointerUtil::PointerType m_currentPtr;
 		};
 	}
 }
