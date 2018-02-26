@@ -14,9 +14,9 @@ sp::memory::LinearAllocator::LinearAllocator(size_t size)
 {
 	assert(size != 0 && "Cannot intialize an allocator with size 0");
 
-	m_memoryBegin.as_void = ReserveAddressSpace(size);
-	m_memoryBegin.as_void = CommitPhysicalMemory(m_memoryBegin.as_void, size);
-	m_memoryEnd.as_ptr = m_memoryBegin.as_ptr + size;
+	m_memoryBegin = pointerUtil::PointerAs<char*>(ReserveAddressSpace(size), 0);
+	m_memoryBegin = pointerUtil::PointerAs<char*>(CommitPhysicalMemory(m_memoryBegin, size), 0);
+	m_memoryEnd = m_memoryBegin + size;
 	m_currentPtr = m_memoryBegin;
 }
 
@@ -28,9 +28,9 @@ sp::memory::LinearAllocator::LinearAllocator(size_t size)
 ///
 sp::memory::LinearAllocator::LinearAllocator(void* memoryStart, void* memoryEnd)
 	: m_useInternalMemory(false)
-	, m_memoryBegin { memoryStart }
-	, m_memoryEnd { memoryEnd }
-	, m_currentPtr { m_memoryBegin }
+	, m_memoryBegin(pointerUtil::PointerAs<char*>(memoryStart, 0))
+	, m_memoryEnd(pointerUtil::PointerAs<char*>(memoryEnd, 0))
+	, m_currentPtr(m_memoryBegin)
 {
 	bool isValidMemoryRange = memoryStart < memoryEnd;
 	assert(isValidMemoryRange && "Memory end is not allowed to be lesser or equal than memory start");
@@ -46,15 +46,15 @@ void* sp::memory::LinearAllocator::Alloc(size_t size, size_t alignment, size_t o
 {
 	assert(pointerUtil::IsPowerOfTwo(alignment) && "Alignment has to be a power-of-two");
 
-	m_currentPtr.as_ptr += offset;
-	m_currentPtr.as_void = pointerUtil::AlignTop(m_currentPtr.as_void, alignment);
-	m_currentPtr.as_ptr -= offset;
+	m_currentPtr += offset;
+	m_currentPtr = pointerUtil::PointerAs<char*>(pointerUtil::AlignTop(m_currentPtr, alignment), 0);
+	m_currentPtr -= offset;
 
-	void* userPointer = m_currentPtr.as_void;
+	void* userPointer = m_currentPtr;
 	
-	m_currentPtr.as_ptr += size;
+	m_currentPtr += size;
 
-	if (m_currentPtr.as_ptr >= m_memoryEnd.as_ptr)
+	if (m_currentPtr >= m_memoryEnd)
 	{
 		return nullptr;
 	}
@@ -86,6 +86,6 @@ sp::memory::LinearAllocator::~LinearAllocator()
 {
 	if (m_useInternalMemory)
 	{
-		FreeAddressSpace(m_memoryBegin.as_void);
+		FreeAddressSpace(m_memoryBegin);
 	}
 }

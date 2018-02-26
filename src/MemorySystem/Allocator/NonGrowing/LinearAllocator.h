@@ -28,9 +28,9 @@ namespace sp
 
 		private:
 			bool m_useInternalMemory;
-			pointerUtil::PointerType m_memoryBegin;
-			pointerUtil::PointerType m_memoryEnd;
-			pointerUtil::PointerType m_currentPtr;
+			char* m_memoryBegin;
+			char* m_memoryEnd;
+			char* m_currentPtr;
 		};
 	}
 }

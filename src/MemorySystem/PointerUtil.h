@@ -30,5 +30,23 @@ namespace sp
 		void* AlignBottom(void* pointer, size_t alignment);
 
 		bool IsPowerOfTwo(size_t number);
+
+		///
+		/// PointerAs
+		///
+		template<typename T>
+		T PointerAs(void* pointer, size_t offset)
+		{
+			union
+			{
+				void* as_void;
+				uintptr_t as_ptr;
+				T as_type;
+			};
+
+			as_void = pointer;
+			as_ptr += offset;
+			return as_type;
+		}
 	}
 }
