@@ -35,10 +35,12 @@ void* sp::memory::StackAllocator::Alloc(size_t size, size_t alignment, size_t of
 	assert(pointerUtil::IsPowerOfTwo(alignment) && "Alignment has to be a power-of-two");
 
 	// 1. Align current + user offset + allocation meta size
-	m_currentPtr.as_ptr + offset + ALLOCATION_META_SIZE;
+	m_currentPtr.as_ptr += offset + ALLOCATION_META_SIZE;
 	m_currentPtr.as_void = pointerUtil::AlignTop(m_currentPtr.as_void, alignment);
 	// 2. Advance current pointer
 	// 3. Write total allocation size (offset + alloca meta + alignment + size) into alloc meta
+
+	return false;
 }
 
 void sp::memory::StackAllocator::Dealloc(void* memory)
