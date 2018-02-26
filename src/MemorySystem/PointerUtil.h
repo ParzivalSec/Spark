@@ -20,13 +20,15 @@ namespace sp
 		};
 
 		///
-		/// Align a pointer to the next higher alignment boundary (only POWs)
+		/// Align a pointer to the next higher alignment boundary (only POTs)
 		///
 		void* AlignTop(void* pointer, size_t alignment);
 
 		///
-		/// Align the pointer to the next smaller alignment boundary (only POWs)
+		/// Align the pointer to the next smaller alignment boundary (only POTs)
 		///
 		void* AlignBottom(void* pointer, size_t alignment);
+
+		bool IsPowerOfTwo(size_t number);
 	}
 }
