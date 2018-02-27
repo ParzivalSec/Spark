@@ -1,6 +1,10 @@
 #pragma once
+
+#include <cstdint>
+
 #include "../AllocatorBase.h"
-#include "../../PointerUtil.h"
+
+#define STACK_ALLOC_LIFO_CHECKS
 
 namespace sp
 {
@@ -20,9 +24,12 @@ namespace sp
 
 		private:
 			bool m_usingInternalMemory;
-			pointerUtil::PointerType m_memoryBegin;
-			pointerUtil::PointerType m_memoryEnd;
-			pointerUtil::PointerType m_currentPtr;
+			char* m_memoryBegin;
+			char* m_memoryEnd;
+			char* m_currentPtr;
+#ifdef STACK_ALLOC_LIFO_CHECKS
+			uint32_t m_allocationID;
+#endif
 		};
 	}
 }
