@@ -14,8 +14,8 @@ sp::memory::LinearAllocator::LinearAllocator(size_t size)
 {
 	assert(size != 0 && "Cannot intialize an allocator with size 0");
 
-	m_memoryBegin = pointerUtil::PointerAs<char*>(ReserveAddressSpace(size), 0);
-	m_memoryBegin = pointerUtil::PointerAs<char*>(CommitPhysicalMemory(m_memoryBegin, size), 0);
+	m_memoryBegin = static_cast<char*>(ReserveAddressSpace(size));
+	m_memoryBegin = static_cast<char*>(CommitPhysicalMemory(m_memoryBegin, size));
 	m_memoryEnd = m_memoryBegin + size;
 	m_currentPtr = m_memoryBegin;
 }
@@ -32,7 +32,7 @@ sp::memory::LinearAllocator::LinearAllocator(void* memoryStart, void* memoryEnd)
 	, m_memoryEnd(pointerUtil::PointerAs<char*>(memoryEnd, 0))
 	, m_currentPtr(m_memoryBegin)
 {
-	bool isValidMemoryRange = memoryStart < memoryEnd;
+	const bool isValidMemoryRange = memoryStart < memoryEnd;
 	assert(isValidMemoryRange && "Memory end is not allowed to be lesser or equal than memory start");
 }
 
@@ -47,7 +47,7 @@ void* sp::memory::LinearAllocator::Alloc(size_t size, size_t alignment, size_t o
 	assert(pointerUtil::IsPowerOfTwo(alignment) && "Alignment has to be a power-of-two");
 
 	m_currentPtr += offset;
-	m_currentPtr = pointerUtil::PointerAs<char*>(pointerUtil::AlignTop(m_currentPtr, alignment), 0);
+	m_currentPtr = static_cast<char*>(pointerUtil::AlignTop(m_currentPtr, alignment));
 	m_currentPtr -= offset;
 
 	void* userPointer = m_currentPtr;
