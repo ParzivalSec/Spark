@@ -5,23 +5,22 @@
 
 const size_t ONE_KIBIBYTE = 1024;
 const size_t ONE_MIBIBYTE = 1024 * ONE_KIBIBYTE;
-const size_t ONE_GIBIBYTE = 1024 * ONE_MIBIBYTE;
 
-TEST(StackAllocator_NonGrowing, SingleAllocation)
+TEST(StackAllocator_NonGrowing, Single_Allocation)
 {
 	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
-	void* raw_mem = stackAllocator.Alloc(256, 4, 0);
-	ASSERT_NE(raw_mem, nullptr) << "StackAllocator shall return a valid pointer";
+	void* raw_mem = stackAllocator.Alloc(256, 1, 0);
+	ASSERT_NE(raw_mem, nullptr) << "StackAllocator shall return a valid pointer without specific alignment";
 }
 
-TEST(StackAllocator_NonGrowing, SingleAllocation_Right_Alignment)
+TEST(StackAllocator_NonGrowing, Single_Allocation_Right_Alignment)
 {
 	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
 	void* raw_mem = stackAllocator.Alloc(256, 16, 0);
-	ASSERT_EQ(sp::pointerUtil::IsAlignedTo(raw_mem, 16), true) << "Raw_mem should be aligned to a 4-byte boundary";
+	ASSERT_EQ(sp::pointerUtil::IsAlignedTo(raw_mem, 16), true) << "Raw_mem should be aligned to a 16-byte boundary";
 }
 
-TEST(StackAllocator_NonGrowing, MultipleAllocation)
+TEST(StackAllocator_NonGrowing, Multiple_Allocation)
 {
 	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
 	void* raw_mem_1 = stackAllocator.Alloc(ONE_MIBIBYTE, 16, 0);
@@ -34,7 +33,7 @@ TEST(StackAllocator_NonGrowing, MultipleAllocation)
 	ASSERT_NE(raw_mem_4, nullptr) << "StackAllocator shall return a valid pointer for raw_mem_4";
 }
 
-TEST(StackAllocator_NonGrowing, ReturnsNullptr_on_OOM)
+TEST(StackAllocator_NonGrowing, Returns_Nullptr_on_OOM)
 {
 	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
 	void* raw_mem_1 = stackAllocator.Alloc(ONE_MIBIBYTE * 6, 4, 0);
@@ -42,7 +41,7 @@ TEST(StackAllocator_NonGrowing, ReturnsNullptr_on_OOM)
 	ASSERT_EQ(raw_mem_2, nullptr) << "StackAllocator shall return nullptr on oom";
 }
 
-TEST(StackAllocator_NonGrowing, ReverseFree)
+TEST(StackAllocator_NonGrowing, Reverse_Free)
 {
 	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
 	void* raw_mem_1 = stackAllocator.Alloc(ONE_MIBIBYTE * 4, 4, 0);
@@ -50,7 +49,7 @@ TEST(StackAllocator_NonGrowing, ReverseFree)
 	// TODO: Proper test LIFO freeing here
 }
 
-TEST(StackAllocator_NonGrowing, ResetAllocator)
+TEST(StackAllocator_NonGrowing, Reset_Allocator)
 {
 	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
 	void* raw_mem_1 = stackAllocator.Alloc(ONE_MIBIBYTE * 4, 4, 0);

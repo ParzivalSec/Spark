@@ -1,10 +1,6 @@
 #pragma once
 
-#include <cstdint>
-
 #include "../AllocatorBase.h"
-
-#define STACK_ALLOC_LIFO_CHECKS
 
 namespace sp
 {
@@ -27,6 +23,7 @@ namespace sp
 			char* m_memoryBegin;
 			char* m_memoryEnd;
 			char* m_currentPtr;
+
 #ifdef STACK_ALLOC_LIFO_CHECKS
 			uint32_t m_allocationID;
 #endif

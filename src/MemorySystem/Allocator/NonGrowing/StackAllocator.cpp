@@ -19,11 +19,14 @@ sp::memory::StackAllocator::StackAllocator(size_t size)
 	, m_memoryBegin(nullptr)
 	, m_memoryEnd(nullptr)
 	, m_currentPtr(nullptr)
+#if defined(STACK_ALLOC_LIFO_CHECKS)
+	, m_allocationID(0)
+#endif
 {
 	assert(size != 0 && "Cannot intialize an allocator with size 0");
 
-	m_memoryBegin = static_cast<char*>(ReserveAddressSpace(size));
-	m_memoryBegin = static_cast<char*>(CommitPhysicalMemory(m_memoryBegin, size));
+	m_memoryBegin = pointerUtil::pseudo_cast<char*>(ReserveAddressSpace(size), 0);
+	m_memoryBegin = pointerUtil::pseudo_cast<char*>(CommitPhysicalMemory(m_memoryBegin, size), 0);
 	m_memoryEnd = m_memoryBegin + size;
 	m_currentPtr = m_memoryBegin;
 }
@@ -33,6 +36,9 @@ sp::memory::StackAllocator::StackAllocator(void* memoryStart, void* memoryEnd)
 	, m_memoryBegin(static_cast<char*>(memoryStart))
 	, m_memoryEnd(static_cast<char*>(memoryEnd))
 	, m_currentPtr(m_memoryBegin)
+#if defined(STACK_ALLOC_LIFO_CHECKS)
+	, m_allocationID(0)
+#endif
 {
 	const bool isValidMemoryRange = memoryStart < memoryEnd;
 	assert(isValidMemoryRange && "Memory end is not allowed to be lesser or equal than memory start");
@@ -110,7 +116,7 @@ void sp::memory::StackAllocator::Dealloc(void* memory)
 	{
 		const uint32_t allocationID = *as_uint32_t;
 		const bool wasFreedInLIFOFashion = allocationID == m_allocationID;
-		assert(wasFreedInLIFOFashion && "Freed other than last allocation. Stack allocator does only support LIFO free.");
+		assert(wasFreedInLIFOFashion && "Freed other than last allocation. Stack allocator does only support freeing in LIFO order.");
 		--m_allocationID;
 	}
 #endif

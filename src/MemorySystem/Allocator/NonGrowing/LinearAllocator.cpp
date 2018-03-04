@@ -28,8 +28,8 @@ sp::memory::LinearAllocator::LinearAllocator(size_t size)
 ///
 sp::memory::LinearAllocator::LinearAllocator(void* memoryStart, void* memoryEnd)
 	: m_useInternalMemory(false)
-	, m_memoryBegin(pointerUtil::PointerAs<char*>(memoryStart, 0))
-	, m_memoryEnd(pointerUtil::PointerAs<char*>(memoryEnd, 0))
+	, m_memoryBegin(pointerUtil::pseudo_cast<char*>(memoryStart, 0))
+	, m_memoryEnd(pointerUtil::pseudo_cast<char*>(memoryEnd, 0))
 	, m_currentPtr(m_memoryBegin)
 {
 	const bool isValidMemoryRange = memoryStart < memoryEnd;

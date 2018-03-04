@@ -47,7 +47,7 @@ namespace sp
 		/// Align the pointer to the next smaller alignment boundary (only POTs)
 		///
 		template<typename T>
-		void* AlignBottom(void* pointer, size_t alignment)
+		void* AlignBottom(T* pointer, size_t alignment)
 		{
 			assert(IsPowerOfTwo(alignment) && "Alignment was no power-of-two");
 
@@ -66,19 +66,12 @@ namespace sp
 		///
 		/// PointerAs
 		///
-		template<typename T>
-		T PointerAs(void* pointer, size_t offset)
+		template<typename T, typename U>
+		T pseudo_cast(U pointer, size_t offset)
 		{
-			union
-			{
-				void* as_void;
-				uintptr_t as_ptr;
-				T as_type;
-			};
-
-			as_void = pointer;
-			as_ptr += offset;
-			return as_type;
+			union { U from; T to; uintptr_t as_ptr; } cast_helper = { pointer };
+			cast_helper.as_ptr += offset;
+			return cast_helper.to;
 		}
 	}
 }
