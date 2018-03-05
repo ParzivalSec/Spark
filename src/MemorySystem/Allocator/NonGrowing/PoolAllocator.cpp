@@ -4,6 +4,7 @@
 
 #include "../../PointerUtil.h"
 #include "../../VirtualMemory/VirtualMemory.h"
+#include "../../MathUtil.h"
 
 namespace
 {
@@ -15,8 +16,7 @@ namespace
 		}
 		else
 		{
-			const size_t alignmentBufferSize = maxElementSize % maxElementAlignment;
-			return maxElementSize + alignmentBufferSize;
+			return sp::math::RoundUp(maxElementSize, maxElementAlignment);
 		}
 	}
 }

@@ -2,14 +2,15 @@
 
 #include "Allocator/NonGrowing/PoolAllocator.h"
 #include "PointerUtil.h"
+#include "MathUtil.h"
 
 const size_t ONE_KIBIBYTE = 1024;
 const size_t ONE_MIBIBYTE = 1024 * ONE_KIBIBYTE;
 
 struct TestObject
 {
-	uint32_t foo;
-	uint32_t bar;
+	uint32_t foo[1000];
+	uint32_t bar[1000];
 };
 
 /// Tests without alignment and offset
@@ -102,10 +103,10 @@ TEST(PoolAllocator_NonGrowing, Allocate_Multiple_Objects_Aligned_From_External_M
 {
 	// Declare some scratch memory on the stack that shall be aligned to 32
 	// Has place for 16 objects of type TestObject
-	__declspec(align(32)) char stackMemory[1024];
+	__declspec(align(32)) char stackMemory[16 * (sizeof(TestObject) + 24)];
 	ASSERT_TRUE(sp::pointerUtil::IsAlignedTo(stackMemory, 32)) << "Stack memory was not aligned properly";
 
-	sp::memory::PoolAllocator pool(stackMemory, stackMemory + 1024, sizeof(TestObject) + 8, 32, 0);
+	sp::memory::PoolAllocator pool(stackMemory, stackMemory + (16 * sizeof(TestObject)), sizeof(TestObject), 32, 0);
 
 	for (size_t i = 0; i < 16; ++i)
 	{

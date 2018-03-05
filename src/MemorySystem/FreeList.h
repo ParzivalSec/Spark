@@ -13,7 +13,7 @@ namespace sp
 			void* GetChunk(void);
 			void ReturnChunk(void* chunk);
 
-			bool IsEmpty(void) const { return m_nextChunk != nullptr; }
+			bool IsEmpty(void) const { return m_nextChunk == nullptr; }
 		private:
 			FreeList* m_nextChunk;
 		};

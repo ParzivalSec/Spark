@@ -11,14 +11,13 @@ namespace
 {
 	static size_t CalculateMinimalChunkSize(size_t maxElementSize, size_t maxElementAlignment)
 	{
-		if (maxElementSize < maxElementAlignment)
+		if (maxElementSize <= maxElementAlignment)
 		{
 			return maxElementAlignment;
 		}
 		else
 		{
-			const size_t alignmentBufferSize = maxElementSize % maxElementAlignment;
-			return maxElementSize + alignmentBufferSize;
+			return sp::math::RoundUp(maxElementSize, maxElementAlignment);
 		}
 	}
 
@@ -38,7 +37,7 @@ sp::memory::GrowingPoolAllocator::GrowingPoolAllocator(size_t elementMaxSize, si
 	, m_maxElementSize(elementMaxSize)
 	, m_maxElementAlignment(elementMaxAlignment)
 	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize, m_maxElementAlignment))
-	, m_growSize(sp::math::RoundUp(m_maxElementSize * elementCount, sp::memory::GetPageSize()))
+	, m_growSize(sp::math::RoundUp((m_minimalChunkSize * elementCount) + m_maxElementAlignment, sp::memory::GetPageSize()))
 {
 	{
 		const bool elementGreaterOrEqualPointerSize = elementMaxSize >= sizeof(uintptr_t);
@@ -47,14 +46,14 @@ sp::memory::GrowingPoolAllocator::GrowingPoolAllocator(size_t elementMaxSize, si
 
 	// Get memory to fulfill the request to store elementCount * elementSize objects with a maxAlignment of X
 	// To do se we need to allocate X bytes more to be able to align top at least one time and fulfill the request however
-	const size_t requiredMemorySize = (elementCount * m_minimalChunkSize) + m_maxElementAlignment;
-	const size_t maximumMemorySize = (elementCount * m_minimalChunkSize) + m_maxElementAlignment;
+	const size_t maximumMemorySize = (elementCountMax * m_minimalChunkSize) + m_maxElementAlignment;
+	const size_t maximumMemorySizeRounded = sp::math::RoundUp(maximumMemorySize, sp::memory::GetPageSize());
 
-	m_virtualMemoryBegin = pointerUtil::pseudo_cast<char*>(ReserveAddressSpace(maximumMemorySize), 0);
-	m_virtualMemoryEnd = m_virtualMemoryBegin + maximumMemorySize;
+	m_virtualMemoryBegin = pointerUtil::pseudo_cast<char*>(ReserveAddressSpace(maximumMemorySizeRounded), 0);
+	m_virtualMemoryEnd = m_virtualMemoryBegin + maximumMemorySizeRounded;
 
-	m_physicalMemoryBegin = pointerUtil::pseudo_cast<char*>(CommitPhysicalMemory(m_virtualMemoryBegin, requiredMemorySize), 0);
-	m_physicalMemoryEnd = m_physicalMemoryBegin + requiredMemorySize;
+	m_physicalMemoryBegin = pointerUtil::pseudo_cast<char*>(CommitPhysicalMemory(m_virtualMemoryBegin, m_growSize), 0);
+	m_physicalMemoryEnd = m_physicalMemoryBegin + m_growSize;
 
 	// Offset the first chunk and align it to ensure all following slots are also aligned
 	m_firstChunkPtr = pointerUtil::AlignTop(m_physicalMemoryBegin + offset, m_maxElementAlignment) - offset;
@@ -79,10 +78,11 @@ void* sp::memory::GrowingPoolAllocator::Alloc(size_t size, size_t alignment, siz
 		}
 
 		char* newPhysicalMem = pointerUtil::pseudo_cast<char*>(Grow(m_physicalMemoryEnd, m_growSize), 0);
+		void* newFirstChunkPtr = sp::pointerUtil::AlignTop(newPhysicalMem + offset, m_maxElementAlignment) - offset;
 		m_physicalMemoryEnd = newPhysicalMem + m_growSize;
 
 		m_freeList.~FreeList();
-		new (&m_freeList) core::FreeList(m_firstChunkPtr, m_physicalMemoryEnd, m_minimalChunkSize);
+		new (&m_freeList) core::FreeList(newFirstChunkPtr, m_physicalMemoryEnd, m_minimalChunkSize);
 	}
 
 	return m_freeList.GetChunk();
