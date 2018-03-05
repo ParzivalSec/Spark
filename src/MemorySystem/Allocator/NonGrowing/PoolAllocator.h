@@ -28,9 +28,9 @@ namespace sp
 			char* m_memoryEnd;
 			char* m_firstChunkPtr;
 
-			const uint32_t m_maxElementSize;
-			const uint32_t m_maxElementAlignment;
-			const uint32_t m_minimalChunkSize;
+			const size_t m_maxElementSize;
+			const size_t m_maxElementAlignment;
+			const size_t m_minimalChunkSize;
 
 			core::FreeList m_freeList;
 		};

@@ -6,6 +6,6 @@ namespace sp
 {
 	namespace math
 	{
-		uint32_t RoundUp(uint32_t number, uint32_t multiple);
+		size_t RoundUp(size_t number, size_t multiple);
 	}
 }

@@ -54,7 +54,7 @@ void* sp::memory::DoubleEndedStackAllocator::Alloc(size_t size, size_t alignment
 	// INFO: Used a ptrdiff_t here earlier by this would take up 8 byte on 64bit machines
 	// so I decided onto uint32_t and assume the allocator will never use more than 2^32
 	// bytes (around 4GB allowed per allocator)
-	const uint32_t allocationOffset = m_currentFront - m_memoryBegin;
+	const ptrdiff_t allocationOffset = m_currentFront - m_memoryBegin;
 	// Align the currentPtr offsetted by offset + AllocationMetaSize to not
 	// mess up alignment when adding canaries later
 	m_currentFront += offset + ALLOCATION_META_SIZE;
@@ -76,7 +76,7 @@ void* sp::memory::DoubleEndedStackAllocator::Alloc(size_t size, size_t alignment
 
 	// Write the allocationOffset in the slot before the userPointer
 	as_char = m_currentFront;
-	*as_uint32_t = allocationOffset;
+	*as_uint32_t = static_cast<uint32_t>(allocationOffset);
 #ifdef STACK_ALLOC_LIFO_CHECKS
 	as_char += sizeof(uint32_t);
 	*as_uint32_t = ++m_frontAllocationId;
@@ -98,7 +98,7 @@ void* sp::memory::DoubleEndedStackAllocator::AllocBack(size_t size, size_t align
 	// INFO: Used a ptrdiff_t here earlier by this would take up 8 byte on 64bit machines
 	// so I decided onto uint32_t and assume the allocator will never use more than 2^32
 	// bytes (around 4GB allowed per allocator)
-	const uint32_t allocationOffset = m_currentBack - m_memoryEnd;
+	const ptrdiff_t allocationOffset = m_currentBack - m_memoryEnd;
 	// Align the currentPtr offsetted by offset + AllocationMetaSize to not
 	// mess up alignment when adding canaries later
 	m_currentBack -= size;
@@ -120,7 +120,7 @@ void* sp::memory::DoubleEndedStackAllocator::AllocBack(size_t size, size_t align
 
 	// Write the allocationOffset in the slot before the userPointer
 	as_char = m_currentBack;
-	*as_uint32_t = allocationOffset;
+	*as_uint32_t = static_cast<uint32_t>(allocationOffset);
 #ifdef STACK_ALLOC_LIFO_CHECKS
 	as_char += sizeof(uint32_t);
 	*as_uint32_t = ++m_backAllocationId;

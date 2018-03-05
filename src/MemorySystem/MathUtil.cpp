@@ -1,13 +1,13 @@
 #include "MathUtil.h"
 
-uint32_t sp::math::RoundUp(uint32_t number, uint32_t multiple)
+size_t sp::math::RoundUp(size_t number, size_t multiple)
 {
 	if (multiple == 0)
 	{
 		return number;
 	}
 
-	const uint32_t remainder = number % multiple;
+	const size_t remainder = number % multiple;
 	
 	if (remainder == 0)
 	{
