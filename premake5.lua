@@ -11,8 +11,9 @@ workspace "Spark"
     filter { "platforms:Win64" }
         system "Windows"
         architecture "x64"
-
-    flags { "FatalWarnings", "ShadowedVariables", "UndefinedIdentifiers" }
+	filter {}
+    
+	flags { "FatalWarnings", "ShadowedVariables", "UndefinedIdentifiers" }
 
 -- During development let `UnitTests` be the startup project
 project "UnitTests"
@@ -22,9 +23,14 @@ project "UnitTests"
 
     files { "src/UnitTests/**.h", "src/UnitTests/**.cpp" }
 
-    libdirs { "./ext/*/lib" }
     links { "MemorySystem" }
-    
+	
+	filter { "platforms:Win64" }
+		libdirs { "./ext/*/lib/x64/" }
+	filter { "platforms:Win32" }
+		libdirs { "./ext/*/lib/x86/" }
+	filter {}
+		
     -- google-test setup (includes/libs)
     includedirs { "ext/googletest/include", "src/MemorySystem/"}
     filter "configurations:Debug"
@@ -33,7 +39,6 @@ project "UnitTests"
         flags { "StaticRuntime" }
 
     filter "configurations:Release"
-        symbols "On"
         links { "gtest" }
         flags { "StaticRuntime" }
 
@@ -58,7 +63,6 @@ project "MemorySystem"
         flags { "StaticRuntime" }
 
     filter "configurations:Release"
-        symbols "On"
         flags { "StaticRuntime" }
 
 project "Containers"
