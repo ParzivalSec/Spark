@@ -9,8 +9,16 @@ void sp::memory::SimpleBoundsChecker::WriteCanary(void* const memory) const
 	*canaryLocation = m_canary;
 }
 
-bool sp::memory::SimpleBoundsChecker::ValidateCanary(void* const memory) const
+void sp::memory::SimpleBoundsChecker::ValidateFrontCanary(void* const memory) const
 {
 	uint32_t* canaryLocation = sp::pointerUtil::pseudo_cast<uint32_t*>(memory, 0);
-	return *canaryLocation == m_canary;
+	bool isValidCanary = *canaryLocation == m_canary;
+	assert(isValidCanary && "Front Canary was not valid");  
+}
+
+void sp::memory::SimpleBoundsChecker::ValidateBackCanary(void* const memory) const
+{
+	uint32_t* canaryLocation = sp::pointerUtil::pseudo_cast<uint32_t*>(memory, 0);
+	bool isValidCanary = *canaryLocation == m_canary;
+	assert(isValidCanary && "Back Canary was not valid");
 }

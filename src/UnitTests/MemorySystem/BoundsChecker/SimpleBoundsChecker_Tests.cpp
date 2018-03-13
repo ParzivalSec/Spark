@@ -18,18 +18,6 @@ TEST(Simple_BoundsChecker, Write_Canary_To_Location)
 	ASSERT_TRUE(valueAtBackCanaryLocation == 0xCA) << "Back canary was not properly written or corrupted";
 }
 
-TEST(Simple_BoundsChecker, Return_True_On_Valid_Canary)
-{
-	sp::memory::SimpleBoundsChecker boundsChecker;
-	char* raw_mem = new char[16];
-
-	boundsChecker.WriteCanary(raw_mem);
-	boundsChecker.WriteCanary(raw_mem + 8);
-
-	ASSERT_TRUE(boundsChecker.ValidateCanary(raw_mem)) << "Could not validate front canary";
-	ASSERT_TRUE(boundsChecker.ValidateCanary(raw_mem + 8)) << "Could not validate back canary";
-}
-
 TEST(Simple_BoundsChecker, Return_False_On_Corrupted_Back_Canary)
 {
 	sp::memory::SimpleBoundsChecker boundsChecker;
@@ -51,7 +39,7 @@ TEST(Simple_BoundsChecker, Return_False_On_Corrupted_Back_Canary)
 	BiggerThanEight* somePtr = sp::pointerUtil::pseudo_cast<BiggerThanEight*>(userPtr, 0);
 	*somePtr = someVariable;
 
-	ASSERT_FALSE(boundsChecker.ValidateCanary(raw_mem + 8)) << "Could not validate back canary";
+	ASSERT_DEATH(boundsChecker.ValidateBackCanary(raw_mem + 8), "Back Canary was not valid") << "Could not validate back canary";
 }
 
 TEST(Simple_BoundsChecker, Return_False_On_Corrupted_Front_Canary)
@@ -75,5 +63,5 @@ TEST(Simple_BoundsChecker, Return_False_On_Corrupted_Front_Canary)
 	BiggerThanEight* somePtr = sp::pointerUtil::pseudo_cast<BiggerThanEight*>(userPtr, 0);
 	*somePtr = someVariable;
 
-	ASSERT_FALSE(boundsChecker.ValidateCanary(raw_mem)) << "Could not validate back canary";
+	ASSERT_DEATH(boundsChecker.ValidateFrontCanary(raw_mem), "Front Canary was not valid") << "Could not validate front canary";
 }
