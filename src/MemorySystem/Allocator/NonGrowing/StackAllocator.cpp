@@ -8,10 +8,22 @@
 namespace
 {
 #ifdef STACK_ALLOC_LIFO_CHECKS
-	const uint32_t ALLOCATION_META_SIZE = sizeof(uint64_t);
+	struct AllocationHeader
+	{
+		uint32_t allocationOffset;
+		uint32_t allocationSize;
+		uint32_t allocationId;
+	};
+
 #else
-	const uint32_t ALLOCATION_META_SIZE = sizeof(uint32_t);
+	struct AllocationHeader
+	{
+		uint32_t allocationOffset;
+		uint32_t allocationSize;
+	};
 #endif
+
+	const uint32_t ALLOCATION_META_SIZE = sizeof(AllocationHeader);
 }
 
 sp::memory::StackAllocator::StackAllocator(size_t size)
@@ -64,19 +76,17 @@ void* sp::memory::StackAllocator::Alloc(size_t size, size_t alignment, size_t of
 	{
 		void* as_void;
 		char* as_char;
-		uint32_t* as_uint32_t;
+		AllocationHeader* as_header;
 	};
 
 	// Write the allocationOffset in the slot before the userPointer
 	as_char = m_currentPtr;
-	*as_uint32_t = static_cast<uint32_t>(allocationOffset);
+	as_header->allocationOffset = static_cast<uint32_t>(allocationOffset);
+	as_header->allocationSize = static_cast<uint32_t>(size);
 #ifdef STACK_ALLOC_LIFO_CHECKS
-	as_char += sizeof(uint32_t);
-	*as_uint32_t = ++m_allocationID;
-	as_char += sizeof(uint32_t);
-#else
-	as_char += ALLOCATION_META_SIZE;
+	as_header->allocationSize = ++m_allocationID;
 #endif
+	as_char += ALLOCATION_META_SIZE;
 	// Store the userPointer into a temp bc otherwise it would be corrupted by
 	// advancing the currentPtr by size bytes
 	void* userPtr = as_void;
@@ -95,7 +105,7 @@ void sp::memory::StackAllocator::Dealloc(void* memory)
 	{
 		void* as_void;
 		char* as_char;
-		uint32_t* as_uint32_t;
+		AllocationHeader* as_header;
 	};
 
 	as_void = memory;
@@ -107,11 +117,10 @@ void sp::memory::StackAllocator::Dealloc(void* memory)
 
 	as_char -= ALLOCATION_META_SIZE;
 
-	const uint32_t allocationOffset = *as_uint32_t;
+	const uint32_t allocationOffset = as_header->allocationOffset;
 #ifdef STACK_ALLOC_LIFO_CHECKS
-	as_char += sizeof(uint32_t);
 	{
-		const uint32_t allocationID = *as_uint32_t;
+		const uint32_t allocationID = as_header.allocationId;
 		const bool wasFreedInLIFOFashion = allocationID == m_allocationID;
 		assert(wasFreedInLIFOFashion && "Freed other than last allocation. Stack allocator does only support freeing in LIFO order.");
 		--m_allocationID;
@@ -123,6 +132,17 @@ void sp::memory::StackAllocator::Dealloc(void* memory)
 void sp::memory::StackAllocator::Reset()
 {
 	m_currentPtr = m_memoryBegin;
+}
+
+size_t sp::memory::StackAllocator::GetAllocationSize(void* memory)
+{
+	{
+		const bool isNotNull = memory != nullptr;
+		assert(isNotNull && "Cannot return allocation size of a nullptr");
+	}
+
+	char* userPointer = static_cast<char*>(memory);
+	return pointerUtil::pseudo_cast<AllocationHeader*>(userPointer - ALLOCATION_META_SIZE, 0)->allocationSize;
 }
 
 sp::memory::StackAllocator::~StackAllocator()

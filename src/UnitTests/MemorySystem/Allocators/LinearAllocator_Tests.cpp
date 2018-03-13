@@ -37,3 +37,15 @@ TEST(LinearAllocator_NonGrowing, ResetWholeAllocator)
 	void* memRaw_afterReset  = linearAlloc.Alloc(ONE_MIBIBYTE * 1, 4, 0);
 	ASSERT_EQ(memRaw_beforeReset, memRaw_afterReset) << "LinearAllocator was not properly reset";
 }
+
+TEST(LinearAllocator_NonGrowing, Return_Right_Allocation_Size)
+{
+	sp::memory::LinearAllocator linearAlloc(ONE_MIBIBYTE * 10);
+
+	void* raw_mem_0 = linearAlloc.Alloc(ONE_MIBIBYTE * 2, 1, 0);
+	ASSERT_TRUE(linearAlloc.GetAllocationSize(raw_mem_0) == ONE_MIBIBYTE * 2);
+	void* raw_mem_1 = linearAlloc.Alloc(ONE_MIBIBYTE * 3, 1, 0);
+	ASSERT_TRUE(linearAlloc.GetAllocationSize(raw_mem_1) == ONE_MIBIBYTE * 3);
+	void* raw_mem_2 = linearAlloc.Alloc(ONE_MIBIBYTE * 4, 1, 0);
+	ASSERT_TRUE(linearAlloc.GetAllocationSize(raw_mem_2) == ONE_MIBIBYTE * 4);
+}

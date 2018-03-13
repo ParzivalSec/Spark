@@ -15,9 +15,9 @@ namespace sp
 			virtual void* Alloc(size_t size, size_t alignment, size_t offset) override;
 			virtual void Dealloc(void* memory) override;
 			virtual void Reset() override;
+			virtual size_t GetAllocationSize(void* memory) override;
 
 			virtual ~StackAllocator() override;
-
 		private:
 			bool m_usingInternalMemory;
 			char* m_memoryBegin;

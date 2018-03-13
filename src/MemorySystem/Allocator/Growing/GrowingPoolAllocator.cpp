@@ -106,6 +106,11 @@ void sp::memory::GrowingPoolAllocator::Reset()
 	new (&m_freeList) core::FreeList(m_firstChunkPtr, m_physicalMemoryEnd, m_minimalChunkSize);
 }
 
+size_t sp::memory::GrowingPoolAllocator::GetAllocationSize(void* memory)
+{
+	return m_minimalChunkSize;
+}
+
 sp::memory::GrowingPoolAllocator::~GrowingPoolAllocator()
 {
 	FreeAddressSpace(m_virtualMemoryBegin);

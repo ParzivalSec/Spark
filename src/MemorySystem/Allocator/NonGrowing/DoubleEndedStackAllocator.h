@@ -12,13 +12,14 @@ namespace sp
 			DoubleEndedStackAllocator(size_t size);
 			DoubleEndedStackAllocator(void* memoryBegin, void* memoryEnd);
 
-			void* Alloc(size_t size, size_t alignment, size_t offset) override;
+			virtual void* Alloc(size_t size, size_t alignment, size_t offset) override;
 			void* AllocBack(size_t size, size_t alignment, size_t offset);
 
-			void Dealloc(void* memory) override;
+			virtual void Dealloc(void* memory) override;
 			void DeallocBack(void* memory);
 
-			void Reset() override;
+			virtual void Reset() override;
+			virtual size_t GetAllocationSize(void* memory) override;
 
 			~DoubleEndedStackAllocator() override;
 

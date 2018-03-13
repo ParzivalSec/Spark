@@ -15,6 +15,7 @@ public:
 	virtual void* Alloc(size_t size, size_t alignment, size_t offset) = 0;
 	virtual void Dealloc(void* memory) = 0;
 	virtual void Reset() = 0;
+	virtual size_t GetAllocationSize(void* memory) = 0;
 	virtual ~AllocatorBase() = 0;
 };
 

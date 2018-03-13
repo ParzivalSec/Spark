@@ -72,3 +72,15 @@ TEST(StackAllocator_NonGrowing, Reset_Allocator)
 	memcpy(&new_mem, raw_mem_4, sizeof(uint32_t));
 	ASSERT_EQ(mem, new_mem);
 }
+
+TEST(StackAllocator_NonGrowing, Return_Right_Allocation_Size)
+{
+	sp::memory::StackAllocator stackAllocator(ONE_MIBIBYTE * 10);
+
+	void* raw_mem_0 = stackAllocator.Alloc(ONE_MIBIBYTE * 2, 1, 0);
+	ASSERT_TRUE(stackAllocator.GetAllocationSize(raw_mem_0) == ONE_MIBIBYTE * 2);
+	void* raw_mem_1 = stackAllocator.Alloc(ONE_MIBIBYTE * 3, 1, 0);
+	ASSERT_TRUE(stackAllocator.GetAllocationSize(raw_mem_1) == ONE_MIBIBYTE * 3);
+	void* raw_mem_2 = stackAllocator.Alloc(ONE_MIBIBYTE * 4, 1, 0);
+	ASSERT_TRUE(stackAllocator.GetAllocationSize(raw_mem_2) == ONE_MIBIBYTE * 4);
+}

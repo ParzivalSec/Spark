@@ -102,6 +102,11 @@ void sp::memory::PoolAllocator::Reset()
 	new (&m_freeList) core::FreeList(m_firstChunkPtr, m_memoryEnd, m_minimalChunkSize);
 }
 
+size_t sp::memory::PoolAllocator::GetAllocationSize(void* memory)
+{
+	return m_minimalChunkSize;
+}
+
 sp::memory::PoolAllocator::~PoolAllocator()
 {
 	if (m_useInternalMemory)

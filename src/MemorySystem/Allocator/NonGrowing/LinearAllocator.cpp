@@ -4,6 +4,16 @@
 
 #include "../../VirtualMemory/VirtualMemory.h"
 
+namespace
+{
+	struct AllocationHeader
+	{
+		uint32_t allocationSize;
+	};
+
+	const uint32_t ALLOCATION_META_SIZE = sizeof(AllocationHeader);
+}
+
 ///
 /// Constructor taking an amount of memory the allocator should provide
 /// Using this constructor the allocator internally allocates
@@ -46,11 +56,20 @@ void* sp::memory::LinearAllocator::Alloc(size_t size, size_t alignment, size_t o
 {
 	assert(pointerUtil::IsPowerOfTwo(alignment) && "Alignment has to be a power-of-two");
 
-	m_currentPtr += offset;
+	m_currentPtr += offset + ALLOCATION_META_SIZE;
 	m_currentPtr = static_cast<char*>(pointerUtil::AlignTop(m_currentPtr, alignment));
-	m_currentPtr -= offset;
+	m_currentPtr -= offset + ALLOCATION_META_SIZE;
 
-	void* userPointer = m_currentPtr;
+	union
+	{
+		void* as_void;
+		char* as_char;
+		AllocationHeader* as_header;
+	};
+
+	as_void = m_currentPtr;
+	as_header->allocationSize = static_cast<uint32_t>(size);
+	as_char += ALLOCATION_META_SIZE;
 	
 	m_currentPtr += size;
 
@@ -59,7 +78,7 @@ void* sp::memory::LinearAllocator::Alloc(size_t size, size_t alignment, size_t o
 		return nullptr;
 	}
 
-	return userPointer;
+	return as_void;
 }
 
 ///
@@ -75,6 +94,17 @@ void sp::memory::LinearAllocator::Dealloc(void* memory) {}
 void sp::memory::LinearAllocator::Reset()
 {
 	m_currentPtr = m_memoryBegin;
+}
+
+size_t sp::memory::LinearAllocator::GetAllocationSize(void* memory)
+{
+	{
+		const bool isNotNull = memory != nullptr;
+		assert(isNotNull && "Cannot return allocation size of a nullptr");
+	}
+
+	char* userPointer = static_cast<char*>(memory);
+	return pointerUtil::pseudo_cast<AllocationHeader*>(userPointer - ALLOCATION_META_SIZE, 0)->allocationSize;
 }
 
 ///

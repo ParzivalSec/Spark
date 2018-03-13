@@ -180,3 +180,14 @@ TEST(DoubleEndedStack_NonGrowing, Reset)
 	const uint32_t mem_mark_back = *sp::pointerUtil::pseudo_cast<uint32_t*>(alloc_back_second, 0);
 	ASSERT_EQ(mem_mark_back, memory_mark) << "Back end did not allocate the proper pointer after Reset() was called once.";
 }
+
+TEST(DoubleEndedStack_NonGrowing, Return_Right_Allocation_Size_Front)
+{
+	sp::memory::DoubleEndedStackAllocator DEStack(ONE_MIBIBYTE * 10);
+	void* raw_mem_0 = DEStack.Alloc(ONE_MIBIBYTE * 2, 1, 0);
+	ASSERT_TRUE(DEStack.GetAllocationSize(raw_mem_0) == ONE_MIBIBYTE * 2) << "Did not return size of 2 MB";
+	void* raw_mem_1 = DEStack.Alloc(ONE_MIBIBYTE * 3, 1, 0);
+	ASSERT_TRUE(DEStack.GetAllocationSize(raw_mem_1) == ONE_MIBIBYTE * 3) << "Did not return size of 3 MB";
+	void* raw_mem_2 = DEStack.Alloc(ONE_MIBIBYTE * 4, 1, 0);
+	ASSERT_TRUE(DEStack.GetAllocationSize(raw_mem_2) == ONE_MIBIBYTE * 4) << "Did not return size of 4 MB";
+}
