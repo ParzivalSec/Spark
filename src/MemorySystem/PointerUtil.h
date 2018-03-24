@@ -67,7 +67,7 @@ namespace sp
 		/// PointerAs
 		///
 		template<typename T, typename U>
-		T pseudo_cast(U pointer, int64_t offset)
+		T pseudo_cast(U pointer, size_t offset)
 		{
 			union { U from; T to; uintptr_t as_ptr; } cast_helper = { pointer };
 			cast_helper.as_ptr += offset;
