@@ -63,12 +63,8 @@ void* sp::memory::DoubleEndedStackAllocator::Alloc(size_t size, size_t alignment
 {
 	assert(pointerUtil::IsPowerOfTwo(alignment) && "Alignment has to be a power-of-two");
 
-	// INFO: Used a ptrdiff_t here earlier by this would take up 8 byte on 64bit machines
-	// so I decided onto uint32_t and assume the allocator will never use more than 2^32
-	// bytes (around 4GB allowed per allocator)
 	const ptrdiff_t allocationOffset = m_currentFront - m_memoryBegin;
-	// Align the currentPtr offsetted by offset + AllocationMetaSize to not
-	// mess up alignment when adding canaries later
+
 	m_currentFront += offset + ALLOCATION_META_SIZE;
 	m_currentFront = pointerUtil::pseudo_cast<char*>(pointerUtil::AlignTop(m_currentFront, alignment), 0);
 	m_currentFront -= offset + ALLOCATION_META_SIZE;
@@ -94,23 +90,17 @@ void* sp::memory::DoubleEndedStackAllocator::Alloc(size_t size, size_t alignment
 	as_header->allocationId = ++m_frontAllocationId;
 #endif
 	as_char += ALLOCATION_META_SIZE;
-	// Store the userPointer into a temp bc otherwise it would be corrupted by
-	// advancing the currentPtr by size bytes
-	void* userPtr = as_void;
 	m_currentFront += size;
-	return userPtr;
+
+	return as_void;
 }
 
 void* sp::memory::DoubleEndedStackAllocator::AllocBack(size_t size, size_t alignment, size_t offset)
 {
 	assert(pointerUtil::IsPowerOfTwo(alignment) && "Alignment has to be a power-of-two");
 
-	// INFO: Used a ptrdiff_t here earlier by this would take up 8 byte on 64bit machines
-	// so I decided onto uint32_t and assume the allocator will never use more than 2^32
-	// bytes (around 4GB allowed per allocator)
 	const ptrdiff_t allocationOffset = m_currentBack - m_memoryEnd;
-	// Align the currentPtr offsetted by offset + AllocationMetaSize to not
-	// mess up alignment when adding canaries later
+
 	m_currentBack -= size;
 	m_currentBack = pointerUtil::pseudo_cast<char*>(pointerUtil::AlignBottom(m_currentBack, alignment), 0);
 	m_currentBack -= (ALLOCATION_META_SIZE + offset);
@@ -136,11 +126,9 @@ void* sp::memory::DoubleEndedStackAllocator::AllocBack(size_t size, size_t align
 	as_header->allocationId = ++m_backAllocationId;
 #endif
 	as_char += ALLOCATION_META_SIZE;
-	// Store the userPointer into a temp bc otherwise it would be corrupted by
-	// advancing the currentPtr by size bytes
-	void* userPtr = as_void;
 	m_currentBack -= ALLOCATION_META_SIZE;
-	return userPtr;
+
+	return as_void;
 }
 
 void sp::memory::DoubleEndedStackAllocator::Dealloc(void* memory)

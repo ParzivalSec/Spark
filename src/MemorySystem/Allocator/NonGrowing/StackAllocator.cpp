@@ -87,11 +87,9 @@ void* sp::memory::StackAllocator::Alloc(size_t size, size_t alignment, size_t of
 	as_header->allocationSize = ++m_allocationID;
 #endif
 	as_char += ALLOCATION_META_SIZE;
-	// Store the userPointer into a temp bc otherwise it would be corrupted by
-	// advancing the currentPtr by size bytes
-	void* userPtr = as_void;
 	m_currentPtr += size;
-	return userPtr;
+
+	return as_void;
 }
 
 void sp::memory::StackAllocator::Dealloc(void* memory)
