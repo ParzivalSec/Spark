@@ -87,7 +87,7 @@ void* sp::memory::StackAllocator::Alloc(size_t size, size_t alignment, size_t of
 	as_header->allocationSize = ++m_allocationID;
 #endif
 	as_char += ALLOCATION_META_SIZE;
-	m_currentPtr += size;
+	m_currentPtr += ALLOCATION_META_SIZE + size;
 
 	return as_void;
 }

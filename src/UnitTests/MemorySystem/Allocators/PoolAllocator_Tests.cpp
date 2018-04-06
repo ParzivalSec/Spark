@@ -115,3 +115,37 @@ TEST(PoolAllocator_NonGrowing, Allocate_Multiple_Objects_Aligned_From_External_M
 		ASSERT_TRUE(sp::pointerUtil::IsAlignedTo(raw_mem, 32)) << "User pointer was not aligned to a 32";
 	}
 }
+
+TEST(PoolAllocator_NonGrowing, Allocations_Do_Not_Invalidate_Objects)
+{
+	struct Data
+	{
+		Data(size_t val)
+			: some(val)
+			, value(val)
+			, without(val)
+			, meaning(val)
+		{}
+
+		size_t some;
+		size_t value;
+		size_t without;
+		size_t meaning;
+	};
+
+	Data* data[10];
+	sp::memory::PoolAllocator poolAllocator(sizeof(Data), 10, 1, 0);
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		data[idx] = new (poolAllocator.Alloc(sizeof(Data), 1, 0)) Data(idx);
+	}
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		ASSERT_TRUE(data[idx]->some == idx);
+		ASSERT_TRUE(data[idx]->value == idx);
+		ASSERT_TRUE(data[idx]->without == idx);
+		ASSERT_TRUE(data[idx]->meaning == idx);
+	}
+}

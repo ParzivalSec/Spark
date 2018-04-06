@@ -49,3 +49,37 @@ TEST(LinearAllocator_NonGrowing, Return_Right_Allocation_Size)
 	void* raw_mem_2 = linearAlloc.Alloc(ONE_MIBIBYTE * 4, 1, 0);
 	ASSERT_TRUE(linearAlloc.GetAllocationSize(raw_mem_2) == ONE_MIBIBYTE * 4);
 }
+
+TEST(LinearAllocator_NonGrowing, Allocations_Do_Not_Invalidate_Objects)
+{
+	struct Data
+	{
+		Data(size_t val) 
+			: some(val)
+			, value(val)
+			, without(val)
+			, meaning(val)
+		{}
+
+		size_t some;
+		size_t value;
+		size_t without;
+		size_t meaning;
+	};
+
+	Data* data[10];
+	sp::memory::LinearAllocator linearAllocator(ONE_MIBIBYTE);
+	
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		data[idx] = new (linearAllocator.Alloc(sizeof(Data), 1, 0)) Data(idx);
+	}
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		ASSERT_TRUE(data[idx]->some == idx);
+		ASSERT_TRUE(data[idx]->value == idx);
+		ASSERT_TRUE(data[idx]->without == idx);
+		ASSERT_TRUE(data[idx]->meaning == idx);
+	}
+}

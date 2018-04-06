@@ -90,7 +90,7 @@ void* sp::memory::DoubleEndedStackAllocator::Alloc(size_t size, size_t alignment
 	as_header->allocationId = ++m_frontAllocationId;
 #endif
 	as_char += ALLOCATION_META_SIZE;
-	m_currentFront += size;
+	m_currentFront += ALLOCATION_META_SIZE + size;
 
 	return as_void;
 }
@@ -126,7 +126,6 @@ void* sp::memory::DoubleEndedStackAllocator::AllocBack(size_t size, size_t align
 	as_header->allocationId = ++m_backAllocationId;
 #endif
 	as_char += ALLOCATION_META_SIZE;
-	m_currentBack -= ALLOCATION_META_SIZE;
 
 	return as_void;
 }

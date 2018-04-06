@@ -191,3 +191,71 @@ TEST(DoubleEndedStack_NonGrowing, Return_Right_Allocation_Size_Front)
 	void* raw_mem_2 = DEStack.Alloc(ONE_MIBIBYTE * 4, 1, 0);
 	ASSERT_TRUE(DEStack.GetAllocationSize(raw_mem_2) == ONE_MIBIBYTE * 4) << "Did not return size of 4 MB";
 }
+
+TEST(DoubleEndedStack_NonGrowing, Front_Allocations_Do_Not_Invalidate_Objects)
+{
+	struct Data
+	{
+		Data(size_t val)
+			: some(val)
+			, value(val)
+			, without(val)
+			, meaning(val)
+		{}
+
+		size_t some;
+		size_t value;
+		size_t without;
+		size_t meaning;
+	};
+
+	Data* data[10];
+	sp::memory::DoubleEndedStackAllocator de_stackAllocator(ONE_MIBIBYTE);
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		data[idx] = new (de_stackAllocator.Alloc(sizeof(Data), 1, 0)) Data(idx);
+	}
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		ASSERT_TRUE(data[idx]->some == idx);
+		ASSERT_TRUE(data[idx]->value == idx);
+		ASSERT_TRUE(data[idx]->without == idx);
+		ASSERT_TRUE(data[idx]->meaning == idx);
+	}
+}
+
+TEST(DoubleEndedStack_NonGrowing, Back_Allocations_Do_Not_Invalidate_Objects)
+{
+	struct Data
+	{
+		Data(size_t val)
+			: some(val)
+			, value(val)
+			, without(val)
+			, meaning(val)
+		{}
+
+		size_t some;
+		size_t value;
+		size_t without;
+		size_t meaning;
+	};
+
+	Data* data[10];
+	sp::memory::DoubleEndedStackAllocator de_stackAllocator(ONE_MIBIBYTE);
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		data[idx] = new (de_stackAllocator.AllocBack(sizeof(Data), 1, 0)) Data(idx);
+	}
+
+	for (size_t idx = 0; idx < 10; ++idx)
+	{
+		ASSERT_TRUE(data[idx]->some == idx);
+		ASSERT_TRUE(data[idx]->value == idx);
+		ASSERT_TRUE(data[idx]->without == idx);
+		ASSERT_TRUE(data[idx]->meaning == idx);
+	}
+}
