@@ -25,6 +25,13 @@ namespace
 	{
 		return sp::memory::CommitPhysicalMemory(from, size);
 	}
+
+	struct AllocationHeader
+	{
+		uint32_t allocationSize;
+	};
+
+	static const uint32_t ALLOCATION_META_SIZE = sizeof(AllocationHeader);
 }
 
 sp::memory::GrowingPoolAllocator::GrowingPoolAllocator(size_t elementMaxSize, size_t elementCount,
@@ -36,7 +43,7 @@ sp::memory::GrowingPoolAllocator::GrowingPoolAllocator(size_t elementMaxSize, si
 	, m_firstChunkPtr(nullptr)
 	, m_maxElementSize(elementMaxSize)
 	, m_maxElementAlignment(elementMaxAlignment)
-	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize, m_maxElementAlignment))
+	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize + ALLOCATION_META_SIZE, m_maxElementAlignment))
 	, m_growSize(sp::math::RoundUp((m_minimalChunkSize * elementCount) + m_maxElementAlignment, sp::memory::GetPageSize()))
 {
 	{
@@ -55,8 +62,9 @@ sp::memory::GrowingPoolAllocator::GrowingPoolAllocator(size_t elementMaxSize, si
 	m_physicalMemoryBegin = pointerUtil::pseudo_cast<char*>(CommitPhysicalMemory(m_virtualMemoryBegin, m_growSize), 0);
 	m_physicalMemoryEnd = m_physicalMemoryBegin + m_growSize;
 
+	const size_t offsetBeforeAlignment = offset + ALLOCATION_META_SIZE;
 	// Offset the first chunk and align it to ensure all following slots are also aligned
-	m_firstChunkPtr = pointerUtil::AlignTop(m_physicalMemoryBegin + offset, m_maxElementAlignment) - offset;
+	m_firstChunkPtr = pointerUtil::AlignTop(m_physicalMemoryBegin + offsetBeforeAlignment, m_maxElementAlignment) - offsetBeforeAlignment;
 	m_freeList.~FreeList();
 	new (&m_freeList) core::FreeList(m_firstChunkPtr, m_physicalMemoryEnd, m_minimalChunkSize);
 }
@@ -78,14 +86,26 @@ void* sp::memory::GrowingPoolAllocator::Alloc(size_t size, size_t alignment, siz
 		}
 
 		char* newPhysicalMem = pointerUtil::pseudo_cast<char*>(Grow(m_physicalMemoryEnd, m_growSize), 0);
-		void* newFirstChunkPtr = sp::pointerUtil::AlignTop(newPhysicalMem + offset, m_maxElementAlignment) - offset;
+		const size_t offsetBeforeAlignment = offset + ALLOCATION_META_SIZE;
+		void* newFirstChunkPtr = sp::pointerUtil::AlignTop(newPhysicalMem + offsetBeforeAlignment, m_maxElementAlignment) - offsetBeforeAlignment;
 		m_physicalMemoryEnd = newPhysicalMem + m_growSize;
 
 		m_freeList.~FreeList();
 		new (&m_freeList) core::FreeList(newFirstChunkPtr, m_physicalMemoryEnd, m_minimalChunkSize);
 	}
 
-	return m_freeList.GetChunk();
+	union
+	{
+		char* as_char;
+		void* as_void;
+		AllocationHeader* as_allocationHeader;
+	};
+
+	as_void = m_freeList.GetChunk();
+	as_allocationHeader->allocationSize = static_cast<uint32_t>(size);
+	as_char += ALLOCATION_META_SIZE;
+
+	return as_void;
 }
 
 void sp::memory::GrowingPoolAllocator::Dealloc(void* memory)
@@ -97,7 +117,8 @@ void sp::memory::GrowingPoolAllocator::Dealloc(void* memory)
 		assert(isAllocatedFromAllocatorRange && "Pointer was not allocated in the range of this allocator");
 	}
 
-	m_freeList.ReturnChunk(memory);
+	char* originalMemory = pointerUtil::pseudo_cast<char*>(memory, 0) - ALLOCATION_META_SIZE;
+	m_freeList.ReturnChunk(originalMemory);
 }
 
 void sp::memory::GrowingPoolAllocator::Reset()
@@ -108,7 +129,13 @@ void sp::memory::GrowingPoolAllocator::Reset()
 
 size_t sp::memory::GrowingPoolAllocator::GetAllocationSize(void* memory)
 {
-	return m_minimalChunkSize;
+	{
+		const bool isNotNull = memory != nullptr;
+		assert(isNotNull && "Cannot return allocation size of a nullptr");
+	}
+
+	char* userPointer = static_cast<char*>(memory);
+	return pointerUtil::pseudo_cast<AllocationHeader*>(userPointer - ALLOCATION_META_SIZE, 0)->allocationSize;
 }
 
 sp::memory::GrowingPoolAllocator::~GrowingPoolAllocator()
