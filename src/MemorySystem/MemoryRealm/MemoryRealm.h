@@ -37,7 +37,6 @@ namespace sp
 				char* allocatorMemory = static_cast<char*>(memory) - m_boundsChecker.CANARY_SIZE;
 
 				m_boundsChecker.ValidateFrontCanary(allocatorMemory);
-				// TODO: Somehow we need to get the allocation size to check back canaries
 				const uint32_t allocationSize = static_cast<uint32_t>(m_allocator.GetAllocationSize(allocatorMemory));
 				m_boundsChecker.ValidateBackCanary(allocatorMemory + m_boundsChecker.CANARY_SIZE + allocationSize);
 
