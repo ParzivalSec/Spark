@@ -19,6 +19,13 @@ namespace
 			return sp::math::RoundUp(maxElementSize, maxElementAlignment);
 		}
 	}
+
+	struct AllocationHeader
+	{
+		uint32_t allocationSize;
+	};
+
+	static const uint32_t ALLOCATION_META_SIZE = sizeof(AllocationHeader);
 }
 
 
@@ -29,7 +36,7 @@ sp::memory::PoolAllocator::PoolAllocator(size_t elementMaxSize, size_t elementCo
 	, m_firstChunkPtr(nullptr)
 	, m_maxElementSize(elementMaxSize)
 	, m_maxElementAlignment(elementMaxAlignment)
-	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize, m_maxElementAlignment))
+	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize + ALLOCATION_META_SIZE, m_maxElementAlignment))
 {
 	{
 		const bool elementGreaterOrEqualPointerSize = elementMaxSize >= sizeof(uintptr_t);
@@ -44,8 +51,9 @@ sp::memory::PoolAllocator::PoolAllocator(size_t elementMaxSize, size_t elementCo
 	m_memoryBegin = pointerUtil::pseudo_cast<char*>(CommitPhysicalMemory(m_memoryBegin, requiredMemorySize), 0);
 	m_memoryEnd = m_memoryBegin + requiredMemorySize;
 
+	const size_t offsetBeforeAlignment = offset + ALLOCATION_META_SIZE;
 	// Offset the first chunk and align it to ensure all following slots are also aligned
-	m_firstChunkPtr = pointerUtil::AlignTop(m_memoryBegin + offset, m_maxElementAlignment) - offset;
+	m_firstChunkPtr = pointerUtil::AlignTop(m_memoryBegin + offsetBeforeAlignment, m_maxElementAlignment) - offsetBeforeAlignment;
 	m_freeList.~FreeList();
 	new (&m_freeList) core::FreeList(m_firstChunkPtr, m_memoryEnd, m_minimalChunkSize);
 }
@@ -57,17 +65,16 @@ sp::memory::PoolAllocator::PoolAllocator(void* memoryBegin, void* memoryEnd, siz
 	, m_firstChunkPtr(nullptr)
 	, m_maxElementSize(elementMaxSize)
 	, m_maxElementAlignment(elementMaxAlignment)
-	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize, m_maxElementAlignment))
+	, m_minimalChunkSize(CalculateMinimalChunkSize(m_maxElementSize + ALLOCATION_META_SIZE, m_maxElementAlignment))
 {
 	{
 		const bool elementGreaterOrEqualPointerSize = elementMaxSize >= sizeof(uintptr_t);
 		assert(elementGreaterOrEqualPointerSize && "Element size must at least be able to store a pointer on this system");
 	}
 
-	const ptrdiff_t memoryBlockLength = m_memoryEnd - m_memoryBegin;
-
+	const size_t offsetBeforeAlignment = offset + ALLOCATION_META_SIZE;
 	// Offset the first chunk and align it to ensure all following slots are also aligned
-	m_firstChunkPtr = pointerUtil::AlignTop(m_memoryBegin + offset, m_maxElementAlignment) - offset;
+	m_firstChunkPtr = pointerUtil::AlignTop(m_memoryBegin + offsetBeforeAlignment, m_maxElementAlignment) - offsetBeforeAlignment;
 	m_freeList.~FreeList();
 	new (&m_freeList) core::FreeList(m_firstChunkPtr, m_memoryEnd, m_minimalChunkSize);
 }
@@ -81,7 +88,18 @@ void* sp::memory::PoolAllocator::Alloc(size_t size, size_t alignment, size_t off
 		assert(alignmentLesserOrEqualMaxElementAlignment && "Allocation alignment has to be lesser or equal to the maximum element alignment provided at construction");
 	}
 
-	return m_freeList.GetChunk();
+	union
+	{
+		char* as_char;
+		void* as_void;
+		AllocationHeader* as_allocationHeader;
+	};
+
+	as_void = m_freeList.GetChunk();
+	as_allocationHeader->allocationSize = static_cast<uint32_t>(size);
+	as_char += ALLOCATION_META_SIZE;
+
+	return as_void;
 }
 
 void sp::memory::PoolAllocator::Dealloc(void* memory)
@@ -89,11 +107,13 @@ void sp::memory::PoolAllocator::Dealloc(void* memory)
 	{
 		const bool isNotNull = memory != nullptr;
 		assert(isNotNull && "Freeing a nullptr is not allowed");
-		const bool isAllocatedFromAllocatorRange = memory >= m_memoryBegin && memory <= m_memoryEnd;
+		const bool isAllocatedFromAllocatorRange = memory >= m_memoryBegin && memory < m_memoryEnd;
 		assert(isAllocatedFromAllocatorRange && "Pointer was not allocated in the range of this allocator");
 	}
 
-	m_freeList.ReturnChunk(memory);
+	char* originalMemory = pointerUtil::pseudo_cast<char*>(memory, 0) - ALLOCATION_META_SIZE;
+	
+	m_freeList.ReturnChunk(originalMemory);
 }
 
 void sp::memory::PoolAllocator::Reset()
@@ -104,7 +124,13 @@ void sp::memory::PoolAllocator::Reset()
 
 size_t sp::memory::PoolAllocator::GetAllocationSize(void* memory)
 {
-	return m_minimalChunkSize;
+	{
+		const bool isNotNull = memory != nullptr;
+		assert(isNotNull && "Cannot return allocation size of a nullptr");
+	}
+
+	char* userPointer = static_cast<char*>(memory);
+	return pointerUtil::pseudo_cast<AllocationHeader*>(userPointer - ALLOCATION_META_SIZE, 0)->allocationSize;
 }
 
 sp::memory::PoolAllocator::~PoolAllocator()
