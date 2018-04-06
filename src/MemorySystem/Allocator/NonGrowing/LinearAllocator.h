@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../AllocatorBase.h"
-#include "../../PointerUtil.h"
 
 ///
-/// A non-growing linear allocator
+/// A non-growing linear allocator 
 /// When allocating memory it just performans a pointer bump
 /// to allocator for the user. There is no possibility to 
 /// free a single allocation. Only the whole allocator can

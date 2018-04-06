@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include "../../PointerUtil.h"
 #include "../../VirtualMemory/VirtualMemory.h"
 
 namespace
@@ -60,6 +61,12 @@ void* sp::memory::LinearAllocator::Alloc(size_t size, size_t alignment, size_t o
 	m_currentPtr = static_cast<char*>(pointerUtil::AlignTop(m_currentPtr, alignment));
 	m_currentPtr -= offset + ALLOCATION_META_SIZE;
 
+	const bool allocationOverflowsRange = m_currentPtr + size + ALLOCATION_META_SIZE > m_memoryEnd;
+	if (allocationOverflowsRange)
+	{
+		return nullptr;
+	}
+
 	union
 	{
 		void* as_void;
@@ -72,11 +79,6 @@ void* sp::memory::LinearAllocator::Alloc(size_t size, size_t alignment, size_t o
 	as_char += ALLOCATION_META_SIZE;
 	
 	m_currentPtr += size;
-
-	if (m_currentPtr >= m_memoryEnd)
-	{
-		return nullptr;
-	}
 
 	return as_void;
 }
