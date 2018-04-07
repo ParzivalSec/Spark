@@ -21,6 +21,7 @@ TEST(VirtualMemory, ReserveRequestedAddressSpace)
 {
 	void* memBegin = sp::memory::ReserveAddressSpace(ONE_MIBIBYTE);
 	ASSERT_NE(memBegin, nullptr) << "ReserveAddressSapce should not return a nullptr";
+	sp::memory::FreeAddressSpace(memBegin);
 }
 
 TEST(VirtualMemory, FreeRequestedAddressSpace)
@@ -38,6 +39,8 @@ TEST(VirtualMemory, CommitPhysicalPages)
 	size_t source = 100;
 	memcpy(physicalMemBegin, &source, sizeof(size_t));
 	ASSERT_EQ(static_cast<size_t*>(physicalMemBegin)[0], 100) << "Could not read 100 from physical memory";
+
+	sp::memory::FreeAddressSpace(memBegin);
 }
 
 TEST(VirtualMemory, CommitPhysicalPagesMedium)
@@ -49,6 +52,8 @@ TEST(VirtualMemory, CommitPhysicalPagesMedium)
 	size_t source = 100;
 	memcpy(physicalMemBegin, &source, sizeof(size_t));
 	ASSERT_EQ(static_cast<size_t*>(physicalMemBegin)[0], 100) << "Could not read 100 from physical memory";
+
+	sp::memory::FreeAddressSpace(memBegin);
 }
 
 TEST(VirtualMemory, CommitPhysicalPagesLarge)
@@ -60,6 +65,8 @@ TEST(VirtualMemory, CommitPhysicalPagesLarge)
 	size_t source = 100;
 	memcpy(physicalMemBegin, &source, sizeof(size_t));
 	ASSERT_EQ(static_cast<size_t*>(physicalMemBegin)[0], 100) << "Could not read 100 from physical memory";
+
+	sp::memory::FreeAddressSpace(memBegin);
 }
 
 TEST(VirtualMemory, DecommitPhysicalPages)
@@ -67,4 +74,5 @@ TEST(VirtualMemory, DecommitPhysicalPages)
 	void* memBegin = sp::memory::ReserveAddressSpace(ONE_MIBIBYTE);
 	void* physicalMemBegin = sp::memory::CommitPhysicalMemory(memBegin, ONE_MIBIBYTE);
 	sp::memory::DecommitPhysicalMemory(physicalMemBegin, ONE_MIBIBYTE);
+	sp::memory::FreeAddressSpace(memBegin);
 }
