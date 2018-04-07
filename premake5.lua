@@ -32,7 +32,7 @@ project "UnitTests"
 	filter {}
 		
     -- google-test setup (includes/libs)
-    includedirs { "ext/googletest/include", "src/MemorySystem/"}
+    includedirs { "ext/googletest/include", "src/MemorySystem/", "src/Containers" }
     filter "configurations:Debug"
         symbols "On"
         links { "gtestd" }
@@ -70,6 +70,21 @@ project "Containers"
     language "C++"
     targetname "cont"
     targetdir "build/containers/%{cfg.buildcfg}"
+	
+	files { "src/Containers/**.h", "src/Containers/**.cpp" }
+	
+	-- Because Containers is a more high-level module of the engine
+	-- it builds upon core modules as the MemorySystem and therefore
+	-- linking it in here
+	links { "MemorySystem" }
+	includedirs { "src/MemorySystem/"}
+
+    filter "configurations:Debug"
+        symbols "On"
+        flags { "StaticRuntime" }
+
+    filter "configurations:Release"
+        flags { "StaticRuntime" }
 
 project "EntityComponentSystem"
     kind "StaticLib"

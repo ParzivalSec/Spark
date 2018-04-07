@@ -2,17 +2,12 @@
 
 size_t sp::math::RoundUp(size_t number, size_t multiple)
 {
-	if (multiple == 0)
-	{
-		return number;
-	}
-
 	const size_t remainder = number % multiple;
-	
-	if (remainder == 0)
-	{
-		return number;
-	}
+	return number - remainder + multiple * !!(remainder);
+}
 
-	return number + multiple - remainder;
+size_t sp::math::RoundDown(size_t numToRound, size_t multiple)
+{
+	const size_t remainder = numToRound % multiple;
+	return numToRound - remainder * !!(remainder);
 }
