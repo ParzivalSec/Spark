@@ -18,19 +18,22 @@ namespace sp
 
 			size_t size(void) const;
 			size_t capacity(void) const;
+			static size_t max_size(void);
 			bool empty(void) const;
 
 			void push_back(const T& object);
 
+			void reserve(size_t newCapacity);
+
 			void resize(size_t newSize);
 			void resize(size_t newSize, const T& object);
-
-			void reserve(size_t newCapacity);
 
 			void erase(size_t index);
 			void erase(size_t rangeBegin, size_t rangeEnd);
 			void erase_by_swap(size_t index);
+			void clear(void);
 
+			void shrink_to_fit(void);
 
 			T& operator[] (size_t index);
 			const T& operator[](size_t index) const;
@@ -135,6 +138,12 @@ namespace sp
 		size_t Vector<T>::capacity() const
 		{
 			return m_capacity;
+		}
+
+		template <typename T>
+		size_t Vector<T>::max_size()
+		{
+			return MAX_ELEMENTS;
 		}
 
 		template <typename T>
@@ -353,6 +362,35 @@ namespace sp
 
 			lastElement->~T();
 			--m_size;
+		}
+
+		template <typename T>
+		void Vector<T>::clear()
+		{
+			T* internalArray = pointerUtil::pseudo_cast<T*>(m_physical_mem_begin, 0);
+			for (size_t idx = 0u; idx < m_size; ++idx)
+			{
+				internalArray[idx].~T();
+			}
+
+			m_size = 0u;
+		}
+
+		template <typename T>
+		void Vector<T>::shrink_to_fit()
+		{
+			// We fullfill the request to handle unused capacity memory back to the OS
+			const size_t commitedBytes = math::RoundUp(m_size * sizeof(T), memory::GetPageSize());
+			const size_t pinnedCapacity = commitedBytes / sizeof(T);
+			if (m_capacity > pinnedCapacity)
+			{
+				// If we really have some committed pages that do not contain any used elements
+				// we can decommit them
+				char* unusedMemory = m_physical_mem_begin + commitedBytes;
+				const size_t bytesToDecommit = m_physical_mem_end - unusedMemory;
+				memory::DecommitPhysicalMemory(unusedMemory, bytesToDecommit);
+				m_capacity = pinnedCapacity;
+			}
 		}
 
 		template <typename T>
