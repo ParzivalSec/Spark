@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "../../PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 #include "../../VirtualMemory/VirtualMemory.h"
 
 namespace

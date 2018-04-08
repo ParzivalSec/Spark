@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "Allocator/NonGrowing/DoubleEndedStackAllocator.h"
-#include "PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 
 const size_t ONE_KIBIBYTE = 1024;
 const size_t ONE_MIBIBYTE = 1024 * ONE_KIBIBYTE;

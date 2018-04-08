@@ -1,8 +1,8 @@
 #pragma once
 
 #include "VirtualMemory/VirtualMemory.h"
-#include "PointerUtil.h"
-#include "MathUtil.h"
+#include "Pointers/PointerUtil.h"
+#include "Math/MathUtil.h"
 
 namespace sp
 {

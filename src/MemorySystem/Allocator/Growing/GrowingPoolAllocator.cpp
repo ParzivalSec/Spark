@@ -3,9 +3,10 @@
 #include <cassert>
 #include <new>
 
-#include "../../PointerUtil.h"
+#include "Math/MathUtil.h"
+#include "Pointers/PointerUtil.h"
 #include "../../VirtualMemory/VirtualMemory.h"
-#include "../../MathUtil.h"
+
 
 namespace
 {

@@ -1,5 +1,5 @@
 #include "SimpleBoundsChecker.h"
-#include "../PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 
 const uint8_t sp::memory::SimpleBoundsChecker::CANARY_SIZE = 4;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MemoryRealmBase.h"
-#include "../PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 
 namespace sp
 {

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "BoundsChecker/SimpleBoundsChecker.h"
-#include "PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 
 TEST(Simple_BoundsChecker, Write_Canary_To_Location)
 {

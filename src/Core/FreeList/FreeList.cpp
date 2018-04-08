@@ -1,6 +1,6 @@
 #include "FreeList.h"
 #include <cstddef>
-#include "PointerUtil.h"
+#include "../Pointers/PointerUtil.h"
 
 sp::core::FreeList::FreeList() 
 	: m_nextChunk(nullptr)

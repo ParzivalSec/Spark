@@ -1,5 +1,5 @@
 #include "DoubleEndedStackAllocator.h"
-#include "../../PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 #include "../../VirtualMemory/VirtualMemory.h"
 
 namespace

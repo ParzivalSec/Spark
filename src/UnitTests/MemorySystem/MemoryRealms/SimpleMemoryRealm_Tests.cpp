@@ -3,7 +3,7 @@
 #include "Allocator/NonGrowing/LinearAllocator.h"
 #include "BoundsChecker/SimpleBoundsChecker.h"
 #include "MemoryRealm/MemoryRealm.h"
-#include "PointerUtil.h"
+#include "Pointers/PointerUtil.h"
 
 const size_t ONE_KIBIBYTE = 1024;
 const size_t ONE_MIBIBYTE = 1024 * ONE_KIBIBYTE;

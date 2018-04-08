@@ -23,7 +23,7 @@ project "UnitTests"
 
     files { "src/UnitTests/**.h", "src/UnitTests/**.cpp" }
 
-    links { "MemorySystem" }
+    links { "MemorySystem", "Core"}
 	
 	filter { "platforms:Win64" }
 		libdirs { "./ext/*/lib/x64/" }
@@ -32,7 +32,7 @@ project "UnitTests"
 	filter {}
 		
     -- google-test setup (includes/libs)
-    includedirs { "ext/googletest/include", "src/MemorySystem/", "src/Containers" }
+    includedirs { "ext/googletest/include", "src/MemorySystem/", "src/Containers", "src/Core"}
     filter "configurations:Debug"
         symbols "On"
         links { "gtestd" }
@@ -43,6 +43,21 @@ project "UnitTests"
         flags { "StaticRuntime" }
 
 -- Spark subsystems that will emit .lib files as artifacts
+project "Core"
+	kind "StaticLib"
+	language "C++"
+	targetname "core"
+	targetdir "build/core/%{cfg.buildcfg}"
+	
+	files { "src/Core/**.h", "src/Core/**.cpp" }
+	
+	filter "configurations:Debug"
+		symbols "On"
+		flags { "StaticRuntime" }
+
+    filter "configurations:Release"
+        flags { "StaticRuntime" }
+				
 project "MemorySystem"
     kind "StaticLib"
     language "C++"
@@ -50,13 +65,15 @@ project "MemorySystem"
     targetdir "build/mem_sys/%{cfg.buildcfg}"
 
     files { "src/MemorySystem/**.h", "src/MemorySystem/**.cpp" }
+	
+	links { "Core" }
+	includedirs { "src/Core/"}
 
     -- Setup filters for VS solution (somehow it ignores the subfolders and does not create them properly)
     -- vpaths { ["MemoryRealm"] = { "src/MemorySystem/MemoryRealm/**.h", "src/MemorySystem/MemoryRealm/**.cpp" } }
     -- vpaths { ["Allocator"] = { "src/MemorySystem/Allocator/**.h", "src/MemorySystem/Allocator/**.cpp" } }
     -- vpaths { ["BoundsChecker"] = { "src/MemorySystem/BoundsChecker/**.h", "src/MemorySystem/BoundsChecker/**.cpp" } }
     -- vpaths { ["MemoryTracker"] = { "src/MemorySystem/MemoryTracker/**.h", "src/MemorySystem/MemoryTracker/**.cpp" } }
-
 
     filter "configurations:Debug"
         symbols "On"
