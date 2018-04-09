@@ -63,13 +63,14 @@ namespace sp
 			Item& operator[](Handle handle);
 			const Item& operator[](Handle handle) const;
 
+			Item* GetItems(void) { return m_items; }
+			const Item* GetItems(void) const { return m_items; }
+
 			Handle Insert(Item&& item);
 			Handle Insert(const Item& item);
 
 			void Erase(Handle handle);
-
 			void Clear(void);
-			void Reset(void);
 
 			bool IsValid(Handle handle) const;
 
@@ -237,13 +238,16 @@ namespace sp
 		template <typename Item>
 		void HandleMap<Item>::Clear()
 		{
-			// TODO: Remove all items and patch all handle generations by one (slower but safe to detect wrong lookups later)
-		}
+			for (size_t idx = 0u; idx < m_itemCount; ++idx)
+			{
+				m_items[idx].~Item();
+				m_handles[idx].generation += 1u;
+			}
 
-		template <typename Item>
-		void HandleMap<Item>::Reset()
-		{
-			// TODO: Remove all items and reset the handle array (faster but no safety for future outdated lookups)
+			m_freeList.~FreeList();
+			new (&m_freeList) core::FreeList(m_handles, m_handles + m_maxItems, sizeof(Item));
+
+			m_itemCount = 0u;
 		}
 
 		template <typename Item>
