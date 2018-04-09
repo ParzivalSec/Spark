@@ -93,8 +93,8 @@ project "Containers"
 	-- Because Containers is a more high-level module of the engine
 	-- it builds upon core modules as the MemorySystem and therefore
 	-- linking it in here
-	links { "MemorySystem" }
-	includedirs { "src/MemorySystem/"}
+	links { "MemorySystem", "Core" }
+	includedirs { "src/MemorySystem/", "src/Core/"}
 
     filter "configurations:Debug"
         symbols "On"
