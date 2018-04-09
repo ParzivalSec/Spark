@@ -39,7 +39,7 @@ TEST(Vector_Basic, Assert_On_Element_Limit_Exceeded)
 }
 */
 
-TEST(Basic_Vector, Reserve)
+TEST(Vector_Basic, Reserve)
 {
 	sp::container::Vector<uint32_t> vec;
 	// We want to reserve spce for 100 32-bit ints (100 * 4 = 400 bytes mem), because we use VirtualMem
@@ -49,7 +49,7 @@ TEST(Basic_Vector, Reserve)
 	ASSERT_EQ(vec.capacity(), 1024) << "Capacity did not match the expected grow behaviour";
 }
 
-TEST(Basic_Vector, Clear)
+TEST(Vector_Basic, Clear)
 {
 	sp::container::Vector<uint32_t> vec;
 	
@@ -63,7 +63,7 @@ TEST(Basic_Vector, Clear)
 
 }
 
-TEST(Basic_Vector, Shrink_To_Fit)
+TEST(Vector_Basic, Shrink_To_Fit)
 {
 	sp::container::Vector<uint32_t> vec;
 	
@@ -79,7 +79,7 @@ TEST(Basic_Vector, Shrink_To_Fit)
 	ASSERT_EQ(vec.capacity(), 2048u) << "shrink_to_fit() did not remove unused capacity (empty committed pages)";
 }
 
-TEST(Basic_Vector, Resize_Default_CTOR)
+TEST(Vector_Basic, Resize_Default_CTOR)
 {
 	sp::container::Vector<uint32_t> vec;
 	vec.resize(100);
@@ -87,7 +87,7 @@ TEST(Basic_Vector, Resize_Default_CTOR)
 	ASSERT_EQ(vec.capacity(), 1024) << "Capacity did not match the expected grow behaviour";
 }
 
-TEST(Basic_Vector, Resize_With_CCTOR)
+TEST(Vector_Basic, Resize_With_CCTOR)
 {
 	sp::container::Vector<uint32_t> vec;
 	vec.resize(100, 42u);
