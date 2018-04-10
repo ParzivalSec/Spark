@@ -110,12 +110,25 @@ project "EntityComponentSystem"
     targetdir "build/ecs/%{cfg.buildcfg}"
 
 -- The `BenchmarkApplication` has to link against the .libs from it's siblings
+-- The BenchmarkApplication will be able to run different test scenarios passed by cmd options
+-- Each scenario is then measure for performance by another app (to ensure same clock for Spark++/RustySpark)
 project "BenchmarkApplication"
     kind "ConsoleApp"
     language "C++"
+	targetname "bench_spark++"
     targetdir "build/benchmark/%{cfg.buildcfg}"
+	
+	files { "src/Benchmarks/**.h", "src/Benchmarks/**.cpp" }
 
-    -- links { "MemorySystem", "Containers", "EntityComponentSystem"  }
+	links { "Core", "MemorySystem" }
+	includedirs { "src/Core/", "src/MemorySystem/", "src/Containers" }
+	
+	filter "configurations:Debug"
+		symbols "On"
+		flags { "StaticRuntime" }
+
+    filter "configurations:Release"
+        flags { "StaticRuntime" }
 
 -- Create a custom clean action
 newaction {
