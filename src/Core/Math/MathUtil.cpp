@@ -9,5 +9,5 @@ size_t sp::math::RoundUp(size_t number, size_t multiple)
 size_t sp::math::RoundDown(size_t numToRound, size_t multiple)
 {
 	const size_t remainder = numToRound % multiple;
-	return numToRound - remainder * !!(remainder);
+	return numToRound - remainder;
 }

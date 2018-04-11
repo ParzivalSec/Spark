@@ -118,7 +118,7 @@ project "BenchmarkApplication"
 	targetname "bench_spark++"
     targetdir "build/benchmark/%{cfg.buildcfg}"
 	
-	files { "src/Benchmarks/**.h", "src/Benchmarks/**.cpp" }
+	files { "src/BenchmarkApplication/**.h", "src/BenchmarkApplication/**.cpp" }
 
 	links { "Core", "MemorySystem" }
 	includedirs { "src/Core/", "src/MemorySystem/", "src/Containers" }
