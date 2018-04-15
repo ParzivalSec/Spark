@@ -103,6 +103,7 @@ namespace sp
 			for (uint32_t idx = 0u; idx < m_maxItems; ++idx)
 			{
 				m_handles[idx].sparseArrayIndex = idx;
+				m_handles[idx].generation = 0u;
 			}
 
 			{
@@ -118,11 +119,15 @@ namespace sp
 		Item& HandleMap<Item>::At(Handle handle)
 		{
 			const InternalId internalId = pointerUtil::pseudo_cast<InternalId>(handle, 0);
-			const HandleData& handleData = m_handles[internalId.sparseArrayIndex];
 
 			{
 				const bool userIndexInRange = internalId.sparseArrayIndex < m_itemCount;
 				assert(userIndexInRange && "Index of handle was out of range of the handle array");
+			}
+
+			const HandleData& handleData = m_handles[internalId.sparseArrayIndex];
+
+			{
 				const bool validGeneration = internalId.generation == handleData.generation;
 				assert(validGeneration && "Generation is invalid or outdated");
 			}
@@ -208,12 +213,13 @@ namespace sp
 		void HandleMap<Item>::Erase(Handle handle)
 		{
 			const InternalId internalId = pointerUtil::pseudo_cast<InternalId>(handle, 0);
-			HandleData& handleData = m_handles[internalId.sparseArrayIndex];
 
 			{
 				const bool userIndexInRange = internalId.sparseArrayIndex < m_itemCount;
 				assert(userIndexInRange && "Index of handle was out of range of the handle array");
 			}
+
+			HandleData& handleData = m_handles[internalId.sparseArrayIndex];
 
 			const bool validGeneration = internalId.generation == handleData.generation;
 			if (!validGeneration)
