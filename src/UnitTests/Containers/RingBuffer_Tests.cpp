@@ -39,7 +39,7 @@ TEST(RingBuffer, Null_On_Empty_Read)
 
 TEST(RingBuffer, Null_On_Empty_Peek)
 {
-	const sp::container::RingBuffer<Task, 100> taskBuffer;
+	sp::container::RingBuffer<Task, 100> taskBuffer;
 	ASSERT_EQ(taskBuffer.Peek(), nullptr) << "Read() on an empty RingBuffer returned a non-null value";
 }
 
@@ -49,9 +49,9 @@ TEST(RingBuffer, Write_Tasks)
 
 	for (size_t id = 0; id < 10; ++id)
 	{
-		Task* task = new Task(id);
-		task->data = &task->taskId;
-		task->kernel = &AnyKernel;
+		Task task(id);
+		task.data = &task.taskId;
+		task.kernel = &AnyKernel;
 
 		taskBuffer.Write(task);
 	}
@@ -73,9 +73,9 @@ TEST(RingBuffer, Peek_Does_Not_Alter_Size)
 
 	for (size_t id = 0; id < 2; ++id)
 	{
-		Task* task = new Task(id);
-		task->data = &task->taskId;
-		task->kernel = &AnyKernel;
+		Task task(id);
+		task.data = &task.taskId;
+		task.kernel = &AnyKernel;
 
 		taskBuffer.Write(task);
 	}
@@ -94,9 +94,9 @@ TEST(RingBuffer, Reset)
 
 	for (size_t id = 0; id < 10; ++id)
 	{
-		Task* task = new Task(id);
-		task->data = &task->taskId;
-		task->kernel = &AnyKernel;
+		Task task(id);
+		task.data = &task.taskId;
+		task.kernel = &AnyKernel;
 
 		taskBuffer.Write(task);
 	}

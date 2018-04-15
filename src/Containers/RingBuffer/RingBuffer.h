@@ -5,16 +5,18 @@ namespace sp
 {
 	namespace container
 	{
-		template <typename Item, size_t InternalCapacity>
+		template <typename Item, size_t Capacity>
 		class RingBuffer
 		{
 		public:
 			RingBuffer();
 
-			void Write(Item* element);
+			void Write(const Item& element);
+			void Write(const Item&& element);
+
 			Item* Read(void);
-			Item* Peek(void) const;
-			void Reset(void);
+			Item* Peek(void);
+			void  Reset(void);
 
 			bool IsEmpty(void) const { return m_isEmpty; }
 			bool IsFull(void)  const { return !IsEmpty(); }
@@ -25,7 +27,7 @@ namespace sp
 			bool m_isEmpty;
 			size_t m_writeIndex;
 			size_t m_readIndex;
-			Item* m_items[InternalCapacity];
+			Item m_items[Capacity];
 		};
 
 		template <typename Item, size_t Capacity>
@@ -36,7 +38,7 @@ namespace sp
 		{}
 
 		template <typename Item, size_t Capacity>
-		void RingBuffer<Item, Capacity>::Write(Item* element)
+		void RingBuffer<Item, Capacity>::Write(const Item& element)
 		{
 			m_isEmpty = false;
 
@@ -50,7 +52,23 @@ namespace sp
 			{
 				++m_readIndex;
 			}
+		}
 
+		template <typename Item, size_t Capacity>
+		void RingBuffer<Item, Capacity>::Write(const Item&& element)
+		{
+			m_isEmpty = false;
+
+			m_items[m_writeIndex] = std::move(element);
+			m_writeIndex = (m_writeIndex + 1) % Capacity;
+
+			// The RingBuffer cannot be full, if we reach the read pointer while writing
+			// we push it forward by one element, overwriting the one previously pointed
+			// to in the next Write() invocation
+			if (m_writeIndex == m_readIndex)
+			{
+				++m_readIndex;
+			}
 		}
 
 		template <typename Item, size_t Capacity>
@@ -61,33 +79,33 @@ namespace sp
 				return nullptr;
 			}
 
-			Item* readItem = m_items[m_readIndex];
+			Item* readItem = &m_items[m_readIndex];
 			m_readIndex = (m_readIndex + 1) % Capacity;
 			m_isEmpty = m_readIndex == m_writeIndex;
 			return readItem;
 		}
 
 		template <typename Item, size_t Capacity>
-		Item* RingBuffer<Item, Capacity>::Peek() const
+		Item* RingBuffer<Item, Capacity>::Peek()
 		{
 			if (IsEmpty())
 			{
 				return nullptr;
 			}
 
-			return m_items[m_readIndex];
+			return &m_items[m_readIndex];
 		}
 
-		template <typename Item, size_t InternalCapacity>
-		void RingBuffer<Item, InternalCapacity>::Reset()
+		template <typename Item, size_t Capacity>
+		void RingBuffer<Item, Capacity>::Reset()
 		{
 			m_writeIndex = 0u;
 			m_readIndex = 0u;
 			m_isEmpty = true;
 		}
 
-		template <typename Item, size_t InternalCapacity>
-		size_t RingBuffer<Item, InternalCapacity>::Size() const
+		template <typename Item, size_t Capacity>
+		size_t RingBuffer<Item, Capacity>::Size() const
 		{
 			size_t size = 0u;
 
@@ -97,7 +115,7 @@ namespace sp
 			}
 			else if (m_readIndex > m_writeIndex)
 			{
-				const size_t sizeReadToEnd = InternalCapacity - m_readIndex;
+				const size_t sizeReadToEnd = Capacity - m_readIndex;
 				size = sizeReadToEnd + m_writeIndex;
 			}
 
