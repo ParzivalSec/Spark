@@ -39,6 +39,7 @@ project "UnitTests"
         flags { "StaticRuntime" }
 
     filter "configurations:Release"
+	    symbols "Off"
         links { "gtest" }
         flags { "StaticRuntime" }
 
@@ -56,6 +57,7 @@ project "Core"
 		flags { "StaticRuntime" }
 
     filter "configurations:Release"
+		symbols "Off"
         flags { "StaticRuntime" }
 				
 project "MemorySystem"
@@ -80,6 +82,7 @@ project "MemorySystem"
         flags { "StaticRuntime" }
 
     filter "configurations:Release"
+		symbols "Off"
         flags { "StaticRuntime" }
 
 project "Containers"
@@ -101,6 +104,7 @@ project "Containers"
         flags { "StaticRuntime" }
 
     filter "configurations:Release"
+	    symbols "Off"
         flags { "StaticRuntime" }
 
 project "EntityComponentSystem"
@@ -128,7 +132,9 @@ project "BenchmarkApplication"
 		flags { "StaticRuntime" }
 
     filter "configurations:Release"
+	    symbols "Off"
         flags { "StaticRuntime" }
+		buildoptions { "/FAs" }
 
 -- Create a custom clean action
 newaction {
