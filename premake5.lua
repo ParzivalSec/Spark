@@ -23,7 +23,7 @@ project "UnitTests"
 
     files { "src/UnitTests/**.h", "src/UnitTests/**.cpp" }
 
-    links { "MemorySystem", "Core"}
+    links { "MemorySystem", "Core", "EntityComponentSystem" }
 	
 	filter { "platforms:Win64" }
 		libdirs { "./ext/*/lib/x64/" }
@@ -32,7 +32,7 @@ project "UnitTests"
 	filter {}
 		
     -- google-test setup (includes/libs)
-    includedirs { "ext/googletest/include", "src/MemorySystem/", "src/Containers", "src/Core"}
+    includedirs { "ext/googletest/include", "src/MemorySystem/", "src/Containers", "src/Core", "src/ECS"}
     filter "configurations:Debug"
         symbols "On"
         links { "gtestd" }
@@ -71,12 +71,6 @@ project "MemorySystem"
 	links { "Core" }
 	includedirs { "src/Core/"}
 
-    -- Setup filters for VS solution (somehow it ignores the subfolders and does not create them properly)
-    -- vpaths { ["MemoryRealm"] = { "src/MemorySystem/MemoryRealm/**.h", "src/MemorySystem/MemoryRealm/**.cpp" } }
-    -- vpaths { ["Allocator"] = { "src/MemorySystem/Allocator/**.h", "src/MemorySystem/Allocator/**.cpp" } }
-    -- vpaths { ["BoundsChecker"] = { "src/MemorySystem/BoundsChecker/**.h", "src/MemorySystem/BoundsChecker/**.cpp" } }
-    -- vpaths { ["MemoryTracker"] = { "src/MemorySystem/MemoryTracker/**.h", "src/MemorySystem/MemoryTracker/**.cpp" } }
-
     filter "configurations:Debug"
         symbols "On"
         flags { "StaticRuntime" }
@@ -112,6 +106,19 @@ project "EntityComponentSystem"
     language "C++"
     targetname "ecs"
     targetdir "build/ecs/%{cfg.buildcfg}"
+
+	files { "src/ECS/**.h", "src/ECS/**.cpp" }
+	
+	links { "Core" }
+	includedirs { "src/Core/"}
+
+    filter "configurations:Debug"
+        symbols "On"
+        flags { "StaticRuntime" }
+
+    filter "configurations:Release"
+	    symbols "Off"
+        flags { "StaticRuntime" }
 
 -- The `BenchmarkApplication` has to link against the .libs from it's siblings
 -- The BenchmarkApplication will be able to run different test scenarios passed by cmd options

@@ -48,7 +48,7 @@ namespace sp
 				m_allocator.Reset();
 			}
 
-			~MemoryRealm() override {}
+			~MemoryRealm() = default;
 
 		private:
 			Allocator m_allocator;
