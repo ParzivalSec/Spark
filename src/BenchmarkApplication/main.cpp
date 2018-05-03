@@ -15,5 +15,5 @@ int main(int argc, char** argv)
 
 	perf_clock.Start();
 	scenarios[atoi(argv[1])]();
-	std::cout << perf_clock.Get() << std::endl;
+	printf("%.3lf", perf_clock.Get());
 }
