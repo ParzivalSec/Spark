@@ -22,23 +22,23 @@ namespace sp
 
 			void* Alloc(size_t bytes, size_t alignment) override
 			{
-				const size_t totalMemory = m_boundsChecker.CANARY_SIZE + bytes + m_boundsChecker.CANARY_SIZE;
+				const size_t totalMemory = BoundChecker::CANARY_SIZE + bytes + BoundChecker::CANARY_SIZE;
 
-				char* memory = static_cast<char*>(m_allocator.Alloc(totalMemory, alignment, m_boundsChecker.CANARY_SIZE));
+				char* memory = static_cast<char*>(m_allocator.Alloc(totalMemory, alignment, BoundChecker::CANARY_SIZE));
 
 				m_boundsChecker.WriteCanary(memory);
 				m_boundsChecker.WriteCanary(memory + m_boundsChecker.CANARY_SIZE + bytes);
 
-				return memory + m_boundsChecker.CANARY_SIZE;
+				return memory + BoundChecker::CANARY_SIZE;
 			}
 
 			void Dealloc(void* memory) override
 			{
-				char* allocatorMemory = static_cast<char*>(memory) - m_boundsChecker.CANARY_SIZE;
+				char* allocatorMemory = static_cast<char*>(memory) - BoundChecker::CANARY_SIZE;
 
 				m_boundsChecker.ValidateFrontCanary(allocatorMemory);
 				const uint32_t allocationSize = static_cast<uint32_t>(m_allocator.GetAllocationSize(allocatorMemory));
-				m_boundsChecker.ValidateBackCanary(allocatorMemory + m_boundsChecker.CANARY_SIZE + allocationSize);
+				m_boundsChecker.ValidateBackCanary(allocatorMemory + (allocationSize - BoundChecker::CANARY_SIZE));
 
 				m_allocator.Dealloc(allocatorMemory);
 			}

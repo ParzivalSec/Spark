@@ -1,5 +1,7 @@
 #pragma once
 
+#include <new>
+
 #include "VirtualMemory/VirtualMemory.h"
 #include "Pointers/PointerUtil.h"
 #include "Math/MathUtil.h"
