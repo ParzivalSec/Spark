@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "RingBuffer/RingBuffer.h"
+#include "Pointers/PointerUtil.h"
 
 struct Task
 {

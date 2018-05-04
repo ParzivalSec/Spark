@@ -2,9 +2,9 @@
 #include "Vector/Vector.h"
 #include "../CommonStruct.h"
 
-static const size_t VEC_COUNT = 1000;
+static const size_t VEC_COUNT = 10000;
 
-void vec_1000_without_cap()
+void vec_10000_without_cap()
 {
 	sp::container::Vector<AllocationData> vec;
 
@@ -14,7 +14,7 @@ void vec_1000_without_cap()
 	}
 }
 
-void vec_1000_with_cap()
+void vec_10000_with_cap()
 {
 	sp::container::Vector<AllocationData> vec;
 
@@ -26,7 +26,7 @@ void vec_1000_with_cap()
 	}
 }
 
-void vec_1000_iteration()
+void vec_10000_iteration()
 {
 	sp::container::Vector<AllocationData> vec;
 
@@ -41,7 +41,7 @@ void vec_1000_iteration()
 	}
 }
 
-void vec_1000_erase_range()
+void vec_10000_erase_range()
 {
 	sp::container::Vector<AllocationData> vec;
 
@@ -50,5 +50,5 @@ void vec_1000_erase_range()
 		vec.push_back(AllocationData());
 	}
 
-	vec.erase(0, 500);
+	vec.erase(0, VEC_COUNT / 2);
 }

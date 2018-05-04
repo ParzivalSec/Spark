@@ -14,6 +14,6 @@ int main(int argc, char** argv)
 	HighPrecisionClock perf_clock;
 
 	perf_clock.Start();
-	scenarios[5]();
+	scenarios[atoi(argv[1])]();
 	printf("%.3lf", perf_clock.Get());
 }

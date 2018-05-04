@@ -13,7 +13,7 @@ workspace "Spark"
         architecture "x64"
 	filter {}
     
-	flags { "FatalWarnings", "ShadowedVariables", "UndefinedIdentifiers" }
+	flags { "ShadowedVariables", "UndefinedIdentifiers" }
 
 -- During development let `UnitTests` be the startup project
 project "UnitTests"
@@ -59,6 +59,7 @@ project "Core"
     filter "configurations:Release"
 		symbols "Off"
         flags { "StaticRuntime" }
+		optimize "Full"
 				
 project "MemorySystem"
     kind "StaticLib"
@@ -78,6 +79,7 @@ project "MemorySystem"
     filter "configurations:Release"
 		symbols "Off"
         flags { "StaticRuntime" }
+		optimize "Full"
 
 project "Containers"
     kind "StaticLib"
@@ -100,6 +102,7 @@ project "Containers"
     filter "configurations:Release"
 	    symbols "Off"
         flags { "StaticRuntime" }
+		optimize "Full"
 
 project "EntityComponentSystem"
     kind "StaticLib"
@@ -119,6 +122,7 @@ project "EntityComponentSystem"
     filter "configurations:Release"
 	    symbols "Off"
         flags { "StaticRuntime" }
+		optimize "Full"
 
 -- The `BenchmarkApplication` has to link against the .libs from it's siblings
 -- The BenchmarkApplication will be able to run different test scenarios passed by cmd options
@@ -131,8 +135,8 @@ project "BenchmarkApplication"
 	
 	files { "src/BenchmarkApplication/**.h", "src/BenchmarkApplication/**.cpp" }
 
-	links { "Core", "MemorySystem" }
-	includedirs { "src/Core/", "src/MemorySystem/", "src/Containers" }
+	links { "Core", "MemorySystem", "EntityComponentSystem"}
+	includedirs { "src/Core/", "src/MemorySystem/", "src/Containers", "src/ECS"}
 	
 	filter "configurations:Debug"
 		symbols "On"
@@ -142,6 +146,7 @@ project "BenchmarkApplication"
 	    symbols "Off"
         flags { "StaticRuntime" }
 		buildoptions { "/FAs" }
+		optimize "Full"
 
 -- Create a custom clean action
 newaction {
