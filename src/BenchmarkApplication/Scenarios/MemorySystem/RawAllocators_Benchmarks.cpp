@@ -7,11 +7,11 @@
 #include "Allocator/NonGrowing/DoubleEndedStackAllocator.h"
 #include "Allocator/NonGrowing/PoolAllocator.h"
 
-static const size_t NUM_ALLOC_OBJ = 100;
+static const size_t NUM_ALLOC_OBJ = 1000;
 static const size_t LINEAR_ALLOC_OVERHEAD = 4;
 static const size_t STACK_ALLOC_OVERHEAD = 8;
 
-void allocate_100_data_objects_new()
+void allocate_1000_data_objects_new()
 {
 	AllocationData* allocations[NUM_ALLOC_OBJ];
 
@@ -26,7 +26,7 @@ void allocate_100_data_objects_new()
 	}
 }
 
-void allocate_100_data_objects_linear()
+void allocate_1000_data_objects_linear()
 {
 	AllocationData* allocations[NUM_ALLOC_OBJ];
 	sp::memory::LinearAllocator linearAlloc(NUM_ALLOC_OBJ * (sizeof(AllocationData) + LINEAR_ALLOC_OVERHEAD));
@@ -43,7 +43,7 @@ void allocate_100_data_objects_linear()
 	}
 }
 
-void allocate_100_data_objects_stack()
+void allocate_1000_data_objects_stack()
 {
 	AllocationData* allocations[NUM_ALLOC_OBJ];
 	sp::memory::StackAllocator stackAlloc(NUM_ALLOC_OBJ * (sizeof(AllocationData) + STACK_ALLOC_OVERHEAD));
@@ -61,7 +61,7 @@ void allocate_100_data_objects_stack()
 	}
 }
 
-void allocate_100_data_objects_double_ended_stack()
+void allocate_1000_data_objects_double_ended_stack()
 {
 	AllocationData* allocations[NUM_ALLOC_OBJ];
 	sp::memory::DoubleEndedStackAllocator deStackAlloc(NUM_ALLOC_OBJ * (sizeof(AllocationData) + STACK_ALLOC_OVERHEAD));
@@ -79,10 +79,10 @@ void allocate_100_data_objects_double_ended_stack()
 	}
 }
 
-void allocate_100_data_objects_pool()
+void allocate_1000_data_objects_pool()
 {
 	AllocationData* allocations[NUM_ALLOC_OBJ];
-	sp::memory::PoolAllocator poolAlloc(sizeof(AllocationData), 100, 1, 0);
+	sp::memory::PoolAllocator poolAlloc(sizeof(AllocationData), NUM_ALLOC_OBJ, 1, 0);
 
 	for (size_t idx = 0; idx < NUM_ALLOC_OBJ; ++idx)
 	{

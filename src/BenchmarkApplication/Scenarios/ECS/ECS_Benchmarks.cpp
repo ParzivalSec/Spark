@@ -112,7 +112,7 @@ void ecs_remove_5000_pos()
 
 	for (size_t idx = 0; idx < NUM_ENTITIES / 500; ++idx)
 	{
-		world.removeEntity(entities[idx]);
+		world.removeComponent<Position>(entities[idx]);
 	}
 }
 
@@ -130,6 +130,6 @@ void ecs_remove_50000_pos()
 
 	for (size_t idx = 0; idx < LARGE_NUM_ENTITIES / 500; ++idx)
 	{
-		world.removeEntity(entities[idx]);
+		world.removeComponent<Position>(entities[idx]);
 	}
 }

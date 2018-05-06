@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include "ComponentStorage.h"
 
 class World
@@ -37,7 +38,6 @@ private:
 	uint32_t m_nextId;
 	uint32_t m_nextIdx;
 	std::vector<uint32_t> m_freeIndices;
-	std::unordered_map<uint32_t, bool> m_activeEntities;
 	std::unordered_map<uint32_t, Storage*> m_componentStorages;
 };
 

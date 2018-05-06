@@ -15,13 +15,13 @@ typedef void(*BenchmarkScenarioFunction)();
 const BenchmarkScenarioFunction scenarios[] =
 {
 	// Allocator benchmarks
-	&allocate_100_data_objects_new,						// ID 0
-	&allocate_100_data_objects_linear,					// ID 1
-	&allocate_100_data_objects_stack,					// ID 2
-	&allocate_100_data_objects_double_ended_stack,		// ID 3
-	&allocate_100_data_objects_pool,					// ID 4
+	&allocate_1000_data_objects_new,					// ID 0
+	&allocate_1000_data_objects_linear,					// ID 1
+	&allocate_1000_data_objects_stack,					// ID 2
+	&allocate_1000_data_objects_double_ended_stack,		// ID 3
+	&allocate_1000_data_objects_pool,					// ID 4
 	// Realm benchmark
-	&memory_realm_linear_100_objects_unsafe,			// ID 5
+	&memory_realm_linear_1000_objects_unsafe,			// ID 5
 	// Vector benchmarks
 	&vec_10000_without_cap,								// ID 6
 	&vec_10000_with_cap,								// ID 7
@@ -32,9 +32,9 @@ const BenchmarkScenarioFunction scenarios[] =
 	&handlemap_10000_iteration,							// ID 11
 	&handlemap_10000_remove,							// ID 12
 	// Ringbuffer benchmarks
-	&ringbuffe_10000_write,								// ID 13
-	&ringbuffer_10000_read,								// ID 14
-	&ringbuffer_15000_write_wrapping,					// ID 15
+	&ringbuffer_1000_write,								// ID 13
+	&ringbuffer_1000_read,								// ID 14
+	&ringbuffer_500_write_wrapping,						// ID 15
 	// ECS
 	&ecs_create_10000_with_pos,							// ID 16
 	&ecs_create_100000_with_pos,						// ID 17

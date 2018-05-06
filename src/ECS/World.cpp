@@ -21,7 +21,6 @@ Entity World::make()
 	}
 
 	const Entity entity(entityId, entityIdx);
-	m_activeEntities.insert({ entityId, true });
 	return entity;
 }
 
@@ -30,7 +29,6 @@ void World::removeEntity(const Entity& entity)
 	if (contains(entity))
 	{
 		m_freeIndices.push_back(entity.idx);
-		m_activeEntities.erase(entity.id);
 		for (std::pair<const uint32_t, Storage*>& store : m_componentStorages)
 		{
 			store.second->remove(entity);
@@ -40,5 +38,5 @@ void World::removeEntity(const Entity& entity)
 
 bool World::contains(const Entity& entity) const
 {
-	return m_activeEntities.count(entity.id) == 1;
+	return std::find(m_freeIndices.begin(), m_freeIndices.end(), entity.idx) == m_freeIndices.end();
 }

@@ -2,10 +2,10 @@
 #include "../CommonStruct.h"
 #include "RingBuffer/RingBuffer.h"
 
-static const size_t RINGBUFFER_COUNT = 10000;
-static const size_t WRAPPING_OFFSET = 5000;
+static const size_t RINGBUFFER_COUNT = 1000;
+static const size_t WRAPPING_OFFSET = 500;
 
-void ringbuffe_10000_write()
+void ringbuffer_1000_write()
 {
 	sp::container::RingBuffer<AllocationData, RINGBUFFER_COUNT> ringbuffer;
 
@@ -15,7 +15,7 @@ void ringbuffe_10000_write()
 	}
 }
 
-void ringbuffer_10000_read()
+void ringbuffer_1000_read()
 {
 	sp::container::RingBuffer<AllocationData, RINGBUFFER_COUNT> ringbuffer;
 
@@ -30,7 +30,7 @@ void ringbuffer_10000_read()
 	}
 }
 
-void ringbuffer_15000_write_wrapping()
+void ringbuffer_500_write_wrapping()
 {
 	sp::container::RingBuffer<AllocationData, RINGBUFFER_COUNT> ringbuffer;
 

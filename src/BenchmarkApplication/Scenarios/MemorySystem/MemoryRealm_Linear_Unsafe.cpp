@@ -7,16 +7,16 @@
 #include "Allocator/NonGrowing/LinearAllocator.h"
 #include "BoundsChecker/SimpleBoundsChecker.h"
 
-static const size_t NUM_ALLOC_OBJ = 100;
+static const size_t NUM_ALLOC_OBJ = 1000;
 static const size_t ALLOCATOR_OVERHEAD = 4;
 static const size_t CANARY_OVERHEAD = 8;
 
 typedef sp::memory::MemoryRealm<sp::memory::LinearAllocator, sp::memory::SimpleBoundsChecker> LinearBoundsCheckingRealm;
 
-void memory_realm_linear_100_objects_unsafe()
+void memory_realm_linear_1000_objects_unsafe()
 {
 	AllocationData* allocations[NUM_ALLOC_OBJ];
-	LinearBoundsCheckingRealm realm(100 * (sizeof(AllocationData) + ALLOCATOR_OVERHEAD + CANARY_OVERHEAD));
+	LinearBoundsCheckingRealm realm(NUM_ALLOC_OBJ * (sizeof(AllocationData) + ALLOCATOR_OVERHEAD + CANARY_OVERHEAD));
 
 	for (size_t idx = 0; idx < NUM_ALLOC_OBJ; ++idx)
 	{
