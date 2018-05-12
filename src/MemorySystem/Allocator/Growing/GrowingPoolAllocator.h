@@ -7,10 +7,22 @@ namespace sp
 {
 	namespace memory
 	{
+		/**
+		 * This growing pool allocator serves as a proof-of-concept on how
+		 * the virtual memory system allows the creation of growing allocators.
+		 * If the limit is exceeded the allocator can commit additional physical
+		 * memory till a maximum allowed limit. It has the same mechanism as the 
+		 * non-growing pool allocator.
+		 */
 		class GrowingPoolAllocator : public AllocatorBase
 		{
 		public:
 			GrowingPoolAllocator(size_t elementMaxSize, size_t elementCount, size_t elementCountMax, size_t elementMaxAlignment, size_t offset);
+
+			GrowingPoolAllocator(const GrowingPoolAllocator& other) = delete;
+			GrowingPoolAllocator(const GrowingPoolAllocator&& other) = delete;
+			GrowingPoolAllocator operator=(const GrowingPoolAllocator& other) = delete;
+			GrowingPoolAllocator operator=(const GrowingPoolAllocator&& other) = delete;
 
 			virtual void* Alloc(size_t size, size_t alignment, size_t offset) override;
 			virtual void Dealloc(void* memory) override;

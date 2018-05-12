@@ -6,11 +6,22 @@ namespace sp
 {
 	namespace memory
 	{
+		/**
+		 * A non-growing double-ended stack allocator
+		 * 
+		 * This allocator grows the same way as the stack allocator, but it is able to 
+		 * grow from both side. This allows the user to better utilize the mempory range.
+		 */
 		class DoubleEndedStackAllocator : public AllocatorBase
 		{
 		public:
 			DoubleEndedStackAllocator(size_t size);
 			DoubleEndedStackAllocator(void* memoryBegin, void* memoryEnd);
+
+			DoubleEndedStackAllocator(const DoubleEndedStackAllocator& other) = delete;
+			DoubleEndedStackAllocator(const DoubleEndedStackAllocator&& other) = delete;
+			DoubleEndedStackAllocator operator=(const DoubleEndedStackAllocator& other) = delete;
+			DoubleEndedStackAllocator operator=(const DoubleEndedStackAllocator&& other) = delete;
 
 			virtual void* Alloc(size_t size, size_t alignment, size_t offset) override;
 			void* AllocBack(size_t size, size_t alignment, size_t offset);

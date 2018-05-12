@@ -7,6 +7,13 @@ namespace sp
 {
 	namespace memory
 	{
+		/**
+		 * The MemoryRealm is an abstraction over several strategies to allocate and debug memory
+		 * allocations in this system. It takes two template type parameters, allowing to specify
+		 * the allocation and bounds-checking strategy. These have to follow the common API in order
+		 * to work with the memory realm. This allows for flexible creation of different allocators
+		 * that can also change behaviour depending on the platform or build mode, if specified.
+		 */
 		template <typename Allocator, typename BoundChecker>
 		class MemoryRealm : public MemoryRealmBase
 		{

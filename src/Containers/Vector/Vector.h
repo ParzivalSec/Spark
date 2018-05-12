@@ -162,11 +162,6 @@ namespace sp
 				GrowByBytes(GetGrowSizeInElements() * sizeof(T));
 			}
 
-			// if we were not able to grow anymore, the placement new will try to write memory that we don't have
-			// and therefore propably crash. This only happens in release mode, because of the missing assert in GrowByBytes().
-			// we decided to do this anyways, because it is propably better to let the user crash, than to just do nothing and
-			// let the user think everything worked fine when it actually did not.
-
 			T* internalArray = pointerUtil::pseudo_cast<T*>(m_physical_mem_begin, 0);
 			new (internalArray + m_size) T(object);
 
@@ -430,10 +425,6 @@ namespace sp
 				assert("Grow would exceed maximum available address space - cannot grow further!" && !addressSpaceEndReached);
 			}
 
-			// We though about this and decided it makes sense that if a user
-			// push_backs into the vector and the grow behaviour would exceed the range
-			// then we allow growing to the maximum available address space and just fail to
-			// grow if we really are out of memory
 			if (m_physical_mem_end + roundedGrowSize > m_virtual_mem_end)
 			{
 				const size_t remainingGrowSpace = m_virtual_mem_end - m_physical_mem_end;
@@ -450,9 +441,7 @@ namespace sp
 		template <typename T>
 		size_t Vector<T>::GetGrowSizeInElements() const
 		{
-			// This is a small trick we found in a blog and thought about a bit
-			// If we allocate one element it is very probable that we allocate a few more and 
-			// it shows a small performance gain when allocating 8 slots at the beginning instead of going 1-2-4-8 for the first few push_backs
+			// This is a small trick found in a blog and thought about a bit
 			// INFO: This is a better optimization for a non virtual mem based vector implementation but we leave it here as a reference to think
 			// about this kind of micro-opts when virtual mem would not be a thing (thank `eternal thing` it is)
 			return m_capacity ? m_capacity * 2 : 8;

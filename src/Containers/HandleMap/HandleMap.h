@@ -7,21 +7,6 @@
 #include "FreeList/FreeList.h"
 #include "Pointers/PointerUtil.h"
 
-//
-// A HandleMap ensures internally contiguous storage of elements of type T while
-// beeing able to hand out Handles (IDs) to these resources while upholding the
-// validity of these handles even though the internal resource was moved to uphold
-// contiguous storage
-//
-// This implementation of a HandleMap is not dynamic and has an upper bound of elements
-// that can be stored & memory for these alements will be allocated too at construction
-// (cap is provided by the user upon construction)
-//
-// In the future process of this projects all containers will receive an API to manage
-// their storage inside a memory block provided by the more low-level MemorySystem
-// (Specifying an Allocator that provides all memory for neccessary allocations)
-//
-
 namespace
 {
 	typedef uint32_t SparseArrayIndex;
@@ -49,6 +34,20 @@ namespace sp
 {
 	namespace container
 	{
+		/*
+		* A HandleMap ensures internally contiguous storage of elements of type T while
+		* beeing able to hand out Handles (IDs) to these resources while upholding the
+		* validity of these handles even though the internal resource was moved to uphold
+		* contiguous storage
+		*
+		* This implementation of a HandleMap is not dynamic and has an upper bound of elements
+		* that can be stored & memory for these alements will be allocated too at construction
+		* (cap is provided by the user upon construction)
+		*
+		* In the future process of this projects all containers will receive an API to manage
+		* their storage inside a memory block provided by the more low-level MemorySystem
+		* (Specifying an Allocator that provides all memory for neccessary allocations)
+		*/
 		typedef size_t Handle;
 
 		template <typename Item>

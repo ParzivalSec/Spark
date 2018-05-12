@@ -22,9 +22,9 @@ namespace sp
 			return alignment == 0 || (as_uintptr & (alignment - 1)) == 0;
 		}
 
-		///
-		/// Align a pointer to the next higher alignment boundary (only POTs)
-		///
+		/*
+		 * Align a pointer to the next higher alignment boundary (only POTs)
+		 */
 		template<typename T>
 		T* AlignTop(T* pointer, size_t alignment)
 		{
@@ -43,9 +43,9 @@ namespace sp
 			return as_T_ptr;
 		}
 
-		///
-		/// Align the pointer to the next smaller alignment boundary (only POTs)
-		///
+		/*
+		 * Align the pointer to the next smaller alignment boundary (only POTs)
+		 */
 		template<typename T>
 		void* AlignBottom(T* pointer, size_t alignment)
 		{
@@ -63,9 +63,12 @@ namespace sp
 			return as_T_ptr;
 		}
 
-		///
-		/// PointerAs
-		///
+		/*
+		 * The pseudo_cast is a helper function to convert one type to another with 
+		 * breaking the strict-aliasing rule. Because most of the time a reintepret_cast
+		 * breaks this rule bc two pointer of different types alias the same storage
+		 * location, type-punning via a union is not breaking this rule.
+		 */
 		template<typename T, typename U>
 		T pseudo_cast(U pointer, size_t offset)
 		{
