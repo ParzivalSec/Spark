@@ -36,12 +36,12 @@ project "UnitTests"
     filter "configurations:Debug"
         symbols "On"
         links { "gtestd" }
-        flags { "StaticRuntime" }
+        staticruntime "on"
 
     filter "configurations:Release"
 	    symbols "Off"
         links { "gtest" }
-        flags { "StaticRuntime" }
+        staticruntime "on"
 
 -- Spark subsystems that will emit .lib files as artifacts
 project "Core"
@@ -54,11 +54,11 @@ project "Core"
 	
 	filter "configurations:Debug"
 		symbols "On"
-		flags { "StaticRuntime" }
+		staticruntime "on"
 
     filter "configurations:Release"
 		symbols "Off"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 		optimize "Full"
 				
 project "MemorySystem"
@@ -74,11 +74,11 @@ project "MemorySystem"
 
     filter "configurations:Debug"
         symbols "On"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 
     filter "configurations:Release"
 		symbols "Off"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 		optimize "Full"
 
 project "Containers"
@@ -97,11 +97,11 @@ project "Containers"
 
     filter "configurations:Debug"
         symbols "On"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 
     filter "configurations:Release"
 	    symbols "Off"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 		optimize "Full"
 
 project "EntityComponentSystem"
@@ -117,11 +117,11 @@ project "EntityComponentSystem"
 
     filter "configurations:Debug"
         symbols "On"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 
     filter "configurations:Release"
 	    symbols "Off"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 		optimize "Full"
 
 -- The `BenchmarkApplication` has to link against the .libs from it's siblings
@@ -140,11 +140,11 @@ project "BenchmarkApplication"
 	
 	filter "configurations:Debug"
 		symbols "On"
-		flags { "StaticRuntime" }
+		staticruntime "on"
 
     filter "configurations:Release"
 	    symbols "Off"
-        flags { "StaticRuntime" }
+        staticruntime "on"
 		buildoptions { "/FAs" }
 		optimize "Full"
 
